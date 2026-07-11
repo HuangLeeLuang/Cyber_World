@@ -505,5 +505,51 @@ window.changeContentPage=function(key,d){listPages[key]=Math.max(0,(listPages[ke
 function refreshContentPages(){paginateCards('inventory','#inventoryItems .item, #inventoryItems .loot-card');paginateCards('shop','#shopGrid .shop-card, #shopGrid .item');paginateCards('codex','#itemCodexPanel .item, #itemCodexPanel .codex-card')}
 const performanceRender=render;render=function(){performanceRender();requestAnimationFrame(refreshContentPages)};requestAnimationFrame(refreshContentPages);
 })();
+/* Loot districts content pack: equipment families, targeted farming, bosses and city incidents. */
+(function(){
+const lootPackItems=[
+ {id:'detective-revolver',name:'偵探重型左輪',slot:'weapon',atk:25,def:0,note:'高暴擊、對隊長穿甲',price:9200,cat:'weapon',art:'pistol-judge',set:'detective'},
+ {id:'whisper-pistol',name:'幽聲消音手槍',slot:'weapon',atk:18,def:1,note:'提高先手，降低增援機率',price:8600,cat:'weapon',art:'pistol-silence',set:'hunter'},
+ {id:'riot-shotgun',name:'鎮暴戰術霰彈槍',slot:'weapon',atk:28,def:2,note:'近距離群體傷害',price:10800,cat:'weapon',art:'shotgun',set:'riot'},
+ {id:'anti-materiel',name:'獵王反器材步槍',slot:'weapon',atk:35,def:-1,note:'對 Boss 額外傷害',price:14800,cat:'weapon',art:'sniper',set:'hunter'},
+ {id:'ronin-blade',name:'黑雨浪人刀',slot:'weapon',atk:30,def:2,note:'低生命時提高反擊',price:12000,cat:'weapon',art:'katana',set:'ronin'},
+ {id:'detective-coat',name:'防彈偵探風衣',slot:'armor',atk:2,def:13,note:'線索與情報成功率提高',price:8800,cat:'armor',art:'armored-coat',set:'detective'},
+ {id:'riot-armor',name:'重型鎮暴甲 Mk.II',slot:'armor',atk:-1,def:20,note:'大幅減傷但行動較慢',price:13200,cat:'armor',art:'heavy',set:'riot'},
+ {id:'hunter-vest',name:'城市獵人背心',slot:'armor',atk:4,def:11,note:'先手與打寶機率提高',price:9700,cat:'armor',art:'vest',set:'hunter'},
+ {id:'ronin-coat',name:'浪人長風衣',slot:'armor',atk:3,def:12,note:'瀕危時閃避提高',price:10200,cat:'armor',art:'carbon',set:'ronin'},
+ {id:'old-watch',name:'停擺的銀色名錶',slot:'accessory',atk:3,def:5,note:'對話情報與暴擊提高',price:7200,cat:'armor',art:'watch',set:'detective'},
+ {id:'ammo-rig',name:'快速裝填彈藥帶',slot:'accessory',atk:6,def:3,note:'提高槍械行動速度',price:7600,cat:'armor',art:'ammo',set:'riot'},
+ {id:'ronin-charm',name:'浪人護身符',slot:'accessory',atk:5,def:5,note:'反擊時恢復少量生命',price:8300,cat:'armor',art:'medal',set:'ronin'}
+];
+lootPackItems.forEach(x=>{if(!inventory.some(v=>v.id===x.id))inventory.push({...x});if(!shopCatalog[x.cat].some(v=>v.id===x.id))shopCatalog[x.cat].push({id:x.id,price:x.price});extraItemArt[x.name]=x.art});
+const lootZones=[
+ {id:'armory',name:'地下軍火庫',desc:'武裝團體封存的軍械庫，手槍與步槍掉落率最高。',image:'public/location-clinic.webp',level:2,cost:8,boss:'軍火庫守衛「銅牆」',drops:['detective-revolver','whisper-pistol','ammo-rig']},
+ {id:'precinct',name:'廢棄警署',desc:'失守的舊警署，主要取得防具、鎮暴武器與證物。',image:'public/location-market.webp',level:3,cost:10,boss:'腐敗警長「灰犬」',drops:['riot-shotgun','riot-armor','old-watch']},
+ {id:'vault',name:'富豪保險庫',desc:'高風險奢華區，能找到飾品、藝術品與高價收藏。',image:'public/location-club.webp',level:3,cost:12,boss:'保險庫管家「白手套」',drops:['old-watch','ronin-charm','detective-coat']},
+ {id:'port',name:'港口貨櫃區',desc:'走私貨櫃每天更換，掉落種類最隨機。',image:'public/location-bar.webp',level:4,cost:14,boss:'港區霸主「鐵鯊」',drops:['hunter-vest','ronin-blade','ammo-rig']},
+ {id:'subway',name:'地下首領競技場',desc:'最高難度連戰，可取得反器材步槍與套裝核心。',image:'public/location-arena.webp',level:5,cost:18,boss:'王冠執行者「黑曜」',drops:['anti-materiel','riot-armor','ronin-coat']}
+];
+if(!save.lootDistricts)save.lootDistricts={clears:{},bosses:{},artifacts:[],weekly:null};
+function zoneGear(id,level){let base=getBase(id)||inventory.find(x=>x.id===id),rar=rollRarity(Math.max(2,level)),scale={common:1,rare:1.12,epic:1.28,legendary:1.48}[rar]||1;return{...base,uid:'zone-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),baseId:id,name:base.name,atk:Math.round((base.atk||0)*scale),def:Math.round((base.def||0)*scale),rarity:rar,affixes:['區域戰利品',rar==='legendary'?'首領印記':'精良零件'],value:Math.round(base.price*.3*scale),enchant:0}}
+function openLootZone(id){let z=lootZones.find(x=>x.id===id);if(!z||save.vitality<z.cost)return notify('體力不足，需要 '+z.cost+'。');openDialogue({title:z.name,image:z.image,noVariation:true,lines:[{speaker:'區域情報員',text:z.desc},{speaker:displayName(0),portrait:portrait(0),text:'先確認撤退路線。擊敗 '+z.boss+' 後，把有價值的裝備全部帶走。'}],choices:[{label:'進入區域',note:'消耗體力 '+z.cost+'，保證取得區域裝備',action:()=>launchLootZone(z)},{label:'先觀察敵情',note:'取得 1 點線索',action:()=>{save.worldStory.clues++;persist()}}]})}
+function launchLootZone(z){save.vitality-=z.cost;selectedMission=Math.min(2,z.level-1);showPage('battle');startBattle();battleState.lootZone=z;let boss={name:z.boss,hp:220+z.level*90,max:220+z.level*90,atk:13+z.level*4,gauge:15};battleState.enemies.push(boss);battleTitle.textContent='打寶區域 · '+z.name;addJournal('打寶',z.name,'進入區域追獵 '+z.boss);renderBattle()}
+window.openLootZone=openLootZone;
+function resolveLootZone(){let z=battleState?.lootZone;if(!z||battleState.zoneRewarded)return;battleState.zoneRewarded=true;let id=z.drops[Math.floor(Math.random()*z.drops.length)],gear=zoneGear(id,z.level);save.gear.push(gear);save.lootDistricts.clears[z.id]=(save.lootDistricts.clears[z.id]||0)+1;save.lootDistricts.bosses[z.id]=true;save.pendingLoot=(save.pendingLoot||[]).concat(gear);if(Math.random()<.22){let artifact={armory:'軍火交易名冊',precinct:'染血的警徽',vault:'企業金庫鑰匙',port:'加密貨運錄音',subway:'王冠計畫名冊'}[z.id];if(!save.lootDistricts.artifacts.includes(artifact))save.lootDistricts.artifacts.push(artifact)}awardXP(60+z.level*18,'首領追獵：'+z.name);addJournal('首領',z.boss,'擊敗首領，獲得「'+gear.name+'」');localStorage.setItem('cyber-crown-save',JSON.stringify(save));notify('專屬掉落：'+gear.name)}
+const lootZoneCheck=checkBattle;checkBattle=function(){let active=battleState?.active,zone=battleState?.lootZone;lootZoneCheck();if(active&&zone&&battleState&&!battleState.active&&!battleState.enemies.some(x=>x.hp>0))resolveLootZone()};
+function renderLootZones(){let host=document.getElementById('lootDistrictPanel');if(!host){host=document.createElement('article');host.id='lootDistrictPanel';host.className='panel phase-dashboard';document.getElementById('adventure').appendChild(host)}host.innerHTML=`<div class="eyebrow">TARGETED LOOT HUNT</div><h2>城市打寶區域</h2><p>每個區域擁有獨立掉落表；勝利保證取得一件該區裝備，並有機會找到改變故事選項的證物。</p><div class="phase-grid">${lootZones.map(z=>`<div class="phase-card"><img loading="lazy" decoding="async" src="${z.image}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px"><h3>${z.name}</h3><p>${z.desc}</p><small>首領：${z.boss}<br>可能掉落：${z.drops.map(id=>getBase(id)?.name||id).join('、')}<br>完成 ${save.lootDistricts.clears[z.id]||0} 次</small><button class="full" onclick="openLootZone('${z.id}')">進入 · 體力 ${z.cost}</button></div>`).join('')}</div><div class="phase-card"><h3>故事證物</h3><p>${save.lootDistricts.artifacts.length?save.lootDistricts.artifacts.join('、'):'尚未發現。證物會在後續對話與結局提供額外選項。'}</p></div>`}
+const cityIncidents=[
+ ['產業勒索','有人要求你的產業繳交保護費。',['強硬拒絕','支付費用','請居民作證']],
+ ['飯店失竊','一名收藏家的保險箱被打開，現場留下企業制式彈殼。',['追查監視畫面','封鎖飯店','私下聯絡收藏家']],
+ ['街頭追車','可疑車輛正載著武器穿越中央城區。',['駕車攔截','通知治安單位','跟蹤至藏身處']],
+ ['隊友的舊識','一名隊友在酒吧遇到多年未見的前搭檔。',['讓他們獨處','加入談話','暗中調查對方']],
+ ['記者的交換','記者願意用一份企業名單交換你的獨家消息。',['提供部分情報','拒絕交易','用人脈確認真偽']]
+];
+function triggerNewIncident(){let e=cityIncidents[Math.floor(Math.random()*cityIncidents.length)];openDialogue({title:'城市事件：'+e[0],lines:[{speaker:'城市快訊',text:e[1]}],choices:e[2].map((c,i)=>({label:c,note:i===0?'聲望或戰鬥結果':i===1?'金錢與人脈結果':'線索與故事結果',action:()=>resolveIncident(e,c,i)}))})}
+function resolveIncident(e,c,i){if(i===0){save.prestige=Math.min(100,save.prestige+2);save.vitality=Math.max(0,save.vitality-3)}if(i===1){save.credits=Math.max(0,save.credits-400);save.contacts=Math.min(100,save.contacts+2)}if(i===2){save.worldStory.clues++;save.worldStory.citizens++}addJournal('隨機事件',e[0],c+'：城市局勢產生新的變化。');persist()}
+window.triggerNewIncident=triggerNewIncident;
+function renderContentPack(){renderLootZones();let h=document.getElementById('contentPackSummary');if(!h){h=document.createElement('article');h.id='contentPackSummary';h.className='panel phase-dashboard';document.getElementById('town').appendChild(h)}let sets={};lootPackItems.forEach(x=>sets[x.set]=(sets[x.set]||0)+1);h.innerHTML=`<div class="eyebrow">NEW CONTENT PACK</div><h2>城市裝備與突發事件</h2><p>新增 12 件裝備、4 個主題套裝、5 個首領、5 個打寶區域與城市事件。</p><div class="chip-row"><span class="chip">偵探套裝</span><span class="chip">城市獵人套裝</span><span class="chip">鎮暴套裝</span><span class="chip">浪人套裝</span><button onclick="triggerNewIncident()">調查今日突發事件</button></div>`}
+const contentPackRender=render;render=function(){contentPackRender();renderContentPack()};renderContentPack();
+guides['打寶區域與故事證物']=['地下軍火庫偏向手槍與彈藥；廢棄警署偏向鎮暴裝備；富豪保險庫偏向飾品；港口貨櫃區掉落較隨機；地下首領競技場難度與獎勵最高。','每次打寶勝利保證取得一件區域裝備，同一型號仍會隨品質產生不同攻防數值。','區域首領有機會掉落故事證物。持有證物會被故事日誌記錄，後續可擴充為人物生死、Boss 身分及結局選項。'];
+})();
 </script>
 </body></html>
