@@ -521,7 +521,8 @@ const lootPackItems=[
  {id:'ammo-rig',name:'快速裝填彈藥帶',slot:'accessory',atk:6,def:3,note:'提高槍械行動速度',price:7600,cat:'armor',art:'ammo',set:'riot'},
  {id:'ronin-charm',name:'浪人護身符',slot:'accessory',atk:5,def:5,note:'反擊時恢復少量生命',price:8300,cat:'armor',art:'medal',set:'ronin'}
 ];
-lootPackItems.forEach(x=>{if(!inventory.some(v=>v.id===x.id))inventory.push({...x});if(!shopCatalog[x.cat].some(v=>v.id===x.id))shopCatalog[x.cat].push({id:x.id,price:x.price});extraItemArt[x.name]=x.art});
+lootPackItems.forEach(x=>{if(!inventory.some(v=>v.id===x.id))inventory.push({...x});if(!shopCatalog[x.cat].some(v=>v.id===x.id))shopCatalog[x.cat].push({id:x.id,price:x.price});extraItemArt[x.name]='loot-pack/'+x.id});
+const lootPackArtFor=itemArtFor;itemArtFor=function(text){let x=lootPackItems.find(v=>text.includes(v.name));return x?'public/items/loot-pack/'+x.id+'.webp':lootPackArtFor(text)};
 const lootZones=[
  {id:'armory',name:'地下軍火庫',desc:'武裝團體封存的軍械庫，手槍與步槍掉落率最高。',image:'public/loot-zones/underground-armory.webp',level:2,cost:8,boss:'軍火庫守衛「銅牆」',drops:['detective-revolver','whisper-pistol','ammo-rig']},
  {id:'precinct',name:'廢棄警署',desc:'失守的舊警署，主要取得防具、鎮暴武器與證物。',image:'public/loot-zones/abandoned-precinct.webp',level:3,cost:10,boss:'腐敗警長「灰犬」',drops:['riot-shotgun','riot-armor','old-watch']},
