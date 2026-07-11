@@ -552,5 +552,16 @@ function renderContentPack(){renderLootZones();let h=document.getElementById('co
 const contentPackRender=render;render=function(){contentPackRender();renderContentPack()};renderContentPack();
 guides['打寶區域與故事證物']=['地下軍火庫偏向手槍與彈藥；廢棄警署偏向鎮暴裝備；富豪保險庫偏向飾品；港口貨櫃區掉落較隨機；地下首領競技場難度與獎勵最高。','每次打寶勝利保證取得一件區域裝備，同一型號仍會隨品質產生不同攻防數值。','區域首領有機會掉落故事證物。持有證物會被故事日誌記錄，後續可擴充為人物生死、Boss 身分及結局選項。'];
 })();
+/* Dedicated boss portraits and city incident illustrations. */
+(function(){
+const bossPortraits={armory:'public/bosses/copper-wall.webp',precinct:'public/bosses/gray-hound.webp',vault:'public/bosses/white-glove.webp',port:'public/bosses/iron-shark.webp',subway:'public/bosses/obsidian.webp'};
+lootZones.forEach(z=>z.portrait=bossPortraits[z.id]);
+const incidentImages={'產業勒索':'public/city-events/industry-extortion.webp','飯店失竊':'public/city-events/hotel-theft.webp','街頭追車':'public/city-events/street-chase.webp','隊友的舊識':'public/city-events/old-partner.webp','記者的交換':'public/city-events/reporter-exchange.webp'};
+const illustratedOpenLootZone=openLootZone;openLootZone=function(id){let z=lootZones.find(x=>x.id===id);if(!z||save.vitality<z.cost)return notify('體力不足，需要 '+z.cost+'。');openDialogue({title:z.name,image:z.image,noVariation:true,lines:[{speaker:z.boss,portrait:z.portrait,text:'這片區域的貨物與規則都屬於我。想帶走裝備，就先證明你們有資格。'},{speaker:displayName(0),portrait:portrait(0),text:z.desc+' 我們會擊敗你，並把證物一起帶走。'}],choices:[{label:'挑戰 '+z.boss,note:'消耗體力 '+z.cost+'，保證取得區域裝備',action:()=>launchLootZone(z)},{label:'先觀察敵情',note:'取得 1 點線索',action:()=>{save.worldStory.clues++;persist()}}]})};
+triggerNewIncident=function(){let e=cityIncidents[Math.floor(Math.random()*cityIncidents.length)];openDialogue({title:'城市事件：'+e[0],image:incidentImages[e[0]],lines:[{speaker:'城市快訊',text:e[1]}],choices:e[2].map((c,i)=>({label:c,note:i===0?'聲望或戰鬥結果':i===1?'金錢與人脈結果':'線索與故事結果',action:()=>resolveIncident(e,c,i)}))})};
+const illustratedLootRender=renderLootZones;renderLootZones=function(){illustratedLootRender();let cards=[...document.querySelectorAll('#lootDistrictPanel .phase-card')];lootZones.forEach((z,i)=>{let card=cards[i];if(!card||card.querySelector('.boss-portrait'))return;let title=card.querySelector('h3');title?.insertAdjacentHTML('beforebegin',`<div class="boss-strip"><img class="boss-portrait" loading="lazy" decoding="async" src="${z.portrait}" alt="${z.boss}"><div><small>區域首領</small><b>${z.boss}</b></div></div>`)})};
+let css=document.createElement('style');css.textContent='.boss-strip{display:flex;gap:10px;align-items:center;margin:10px 0;padding:8px;background:#0a101ccc;border:1px solid #35445c;border-radius:9px}.boss-strip img{width:64px;height:82px;object-fit:cover;border-radius:7px}.boss-strip b,.boss-strip small{display:block}';document.head.appendChild(css);
+renderLootZones();
+})();
 </script>
 </body></html>
