@@ -523,11 +523,11 @@ const lootPackItems=[
 ];
 lootPackItems.forEach(x=>{if(!inventory.some(v=>v.id===x.id))inventory.push({...x});if(!shopCatalog[x.cat].some(v=>v.id===x.id))shopCatalog[x.cat].push({id:x.id,price:x.price});extraItemArt[x.name]=x.art});
 const lootZones=[
- {id:'armory',name:'地下軍火庫',desc:'武裝團體封存的軍械庫，手槍與步槍掉落率最高。',image:'public/location-clinic.webp',level:2,cost:8,boss:'軍火庫守衛「銅牆」',drops:['detective-revolver','whisper-pistol','ammo-rig']},
- {id:'precinct',name:'廢棄警署',desc:'失守的舊警署，主要取得防具、鎮暴武器與證物。',image:'public/location-market.webp',level:3,cost:10,boss:'腐敗警長「灰犬」',drops:['riot-shotgun','riot-armor','old-watch']},
- {id:'vault',name:'富豪保險庫',desc:'高風險奢華區，能找到飾品、藝術品與高價收藏。',image:'public/location-club.webp',level:3,cost:12,boss:'保險庫管家「白手套」',drops:['old-watch','ronin-charm','detective-coat']},
- {id:'port',name:'港口貨櫃區',desc:'走私貨櫃每天更換，掉落種類最隨機。',image:'public/location-bar.webp',level:4,cost:14,boss:'港區霸主「鐵鯊」',drops:['hunter-vest','ronin-blade','ammo-rig']},
- {id:'subway',name:'地下首領競技場',desc:'最高難度連戰，可取得反器材步槍與套裝核心。',image:'public/location-arena.webp',level:5,cost:18,boss:'王冠執行者「黑曜」',drops:['anti-materiel','riot-armor','ronin-coat']}
+ {id:'armory',name:'地下軍火庫',desc:'武裝團體封存的軍械庫，手槍與步槍掉落率最高。',image:'public/loot-zones/underground-armory.webp',level:2,cost:8,boss:'軍火庫守衛「銅牆」',drops:['detective-revolver','whisper-pistol','ammo-rig']},
+ {id:'precinct',name:'廢棄警署',desc:'失守的舊警署，主要取得防具、鎮暴武器與證物。',image:'public/loot-zones/abandoned-precinct.webp',level:3,cost:10,boss:'腐敗警長「灰犬」',drops:['riot-shotgun','riot-armor','old-watch']},
+ {id:'vault',name:'富豪保險庫',desc:'高風險奢華區，能找到飾品、藝術品與高價收藏。',image:'public/loot-zones/luxury-vault.webp',level:3,cost:12,boss:'保險庫管家「白手套」',drops:['old-watch','ronin-charm','detective-coat']},
+ {id:'port',name:'港口貨櫃區',desc:'走私貨櫃每天更換，掉落種類最隨機。',image:'public/loot-zones/container-port.webp',level:4,cost:14,boss:'港區霸主「鐵鯊」',drops:['hunter-vest','ronin-blade','ammo-rig']},
+ {id:'subway',name:'地下首領競技場',desc:'最高難度連戰，可取得反器材步槍與套裝核心。',image:'public/loot-zones/boss-arena.webp',level:5,cost:18,boss:'王冠執行者「黑曜」',drops:['anti-materiel','riot-armor','ronin-coat']}
 ];
 if(!save.lootDistricts)save.lootDistricts={clears:{},bosses:{},artifacts:[],weekly:null};
 function zoneGear(id,level){let base=getBase(id)||inventory.find(x=>x.id===id),rar=rollRarity(Math.max(2,level)),scale={common:1,rare:1.12,epic:1.28,legendary:1.48}[rar]||1;return{...base,uid:'zone-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),baseId:id,name:base.name,atk:Math.round((base.atk||0)*scale),def:Math.round((base.def||0)*scale),rarity:rar,affixes:['區域戰利品',rar==='legendary'?'首領印記':'精良零件'],value:Math.round(base.price*.3*scale),enchant:0}}
