@@ -917,6 +917,13 @@ const compactRender=render;render=function(){compactRender();compactifyUi();rend
 let compactCss=document.createElement('style');compactCss.textContent=`
 #town>.hero,#town>.notice,#town>.grid,#town>.squad{display:none}.today-simple{max-width:760px;margin:0 auto;padding:24px 4px}.today-simple h1{margin:5px 0}.today-simple>p{color:#aeb8ba;max-width:640px}.next-action{display:block;width:100%;text-align:left;padding:16px;margin:20px 0}.next-action b,.next-action small{display:block}.next-action small{margin-top:5px;color:#172024}.today-venues{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.today-venues button{padding:0;overflow:hidden}.today-venues img{display:block;width:100%;height:96px;object-fit:cover}.today-venues b{display:block;padding:8px}.compact-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.compact-grid button{min-height:86px;padding:14px}.party-status{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}.party-status h2,.party-status p{margin:5px 0}.party-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0}.party-tabs button{white-space:nowrap}.party-focus{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:center}.party-focus>img{width:130px;height:130px;object-fit:cover}.party-focus h2,.party-focus p{margin:6px 0}.party-focus button{margin:7px 6px 0 0}@media(max-width:800px){.today-venues{grid-template-columns:repeat(2,1fr)}.today-venues img{height:82px}.compact-grid{grid-template-columns:1fr}.party-status,.party-focus{grid-template-columns:1fr}.party-focus>img{width:96px;height:96px}}
 `;document.head.appendChild(compactCss);
+let legacyNavCss=document.createElement('style');legacyNavCss.textContent='header nav>button[data-page]{display:none!important}#hubNavigation{display:flex!important}';document.head.appendChild(legacyNavCss);
+/* Remove the legacy menu from the DOM and use direct hub switching for reliable navigation. */
+function purgeLegacyNavigation(){document.querySelectorAll('header nav>button[data-page]').forEach(button=>button.remove())}
+function openPrimaryHub(id){let page=document.getElementById(id);if(!page)return;document.querySelectorAll('.page').forEach(node=>node.classList.remove('active-page'));page.classList.add('active-page');purgeLegacyNavigation();render();document.querySelectorAll('#hubNavigation button').forEach(button=>button.classList.toggle('active',button.textContent===({town:'今日',party:'隊伍',actionHub:'行動',cityHub:'城市',moreHub:'更多'}[hubForPage(id)])))}
+window.openHub=openPrimaryHub;
+const legacyCompactify=compactifyUi;compactifyUi=function(){legacyCompactify();purgeLegacyNavigation()};
+purgeLegacyNavigation();render();
 renderCombatOptions();renderBattle();
 })();
 </script>
