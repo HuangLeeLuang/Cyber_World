@@ -563,5 +563,29 @@ const illustratedLootRender=renderLootZones;renderLootZones=function(){illustrat
 let css=document.createElement('style');css.textContent='.boss-strip{display:flex;gap:10px;align-items:center;margin:10px 0;padding:8px;background:#0a101ccc;border:1px solid #35445c;border-radius:9px}.boss-strip img{width:64px;height:82px;object-fit:cover;border-radius:7px}.boss-strip b,.boss-strip small{display:block}';document.head.appendChild(css);
 renderLootZones();
 })();
+/* Playtest hardening: safe defeat handling, boss phases, daily incidents and loot pity. */
+(function(){
+if(!save.playtest)save.playtest={incidentDay:0,lootPity:0,bossWins:0};
+combatTick=function(){
+ if(!battleState?.active)return;
+ let activeAllies=battleState.allies.filter(x=>x.hp>0);for(let i=0;i<activeAllies.length;i++){let x=activeAllies[i];x.gauge+=(2.2+i*.15)*battleSpeed;if(x.gauge>=100&&autoBattle){if(!battleState.enemies.some(e=>e.hp>0))break;useSkill(battleState.allies.indexOf(x))}}
+ let boss=battleState.lootZone?battleState.enemies[battleState.enemies.length-1]:null;
+ if(boss&&boss.hp>0&&!boss.phaseTwo&&boss.hp<=boss.max*.5){boss.phaseTwo=true;boss.atk+=4;boss.gauge+=35;boss.name+=' · 狂暴';battleState.allies.forEach(a=>a.gauge=Math.max(0,a.gauge-12));log('⚠ 首領進入第二階段：攻擊提高並壓制全隊行動值。');notify('Boss 進入第二階段！')}
+ let enemies=battleState.enemies.filter(x=>x.hp>0);
+ for(let x of enemies){
+  if(!battleState.active)break;x.gauge+=1.6*battleSpeed;
+  if(x.gauge<100)continue;x.gauge=0;
+  let alive=battleState.allies.filter(a=>a.hp>0);if(!alive.length){checkBattle();break}
+  let t=alive[Math.floor(Math.random()*alive.length)],special=x===boss&&x.phaseTwo&&Math.random()<.28,d=Math.max(1,x.atk-t.def)+(special?6:0);t.hp=Math.max(0,t.hp-d);log(x.name+(special?' 使用「處決射擊」攻擊 ':' 攻擊 ')+t.name+'，造成 '+d+' 傷害。');
+  if(!battleState.allies.some(a=>a.hp>0)){checkBattle();break}
+ }
+ checkBattle();renderBattle();
+};
+const dailyIllustratedIncident=triggerNewIncident;triggerNewIncident=function(){if(save.playtest.incidentDay===save.day)return notify('今天的城市突發事件已處理，明天會出現新事件。');save.playtest.incidentDay=save.day;localStorage.setItem('cyber-crown-save',JSON.stringify(save));dailyIllustratedIncident()};
+const pityZoneGear=zoneGear;zoneGear=function(id,level){let g=pityZoneGear(id,level);save.playtest.lootPity++;if(save.playtest.lootPity>=3&&g.rarity==='common'){g.rarity='rare';g.atk=Math.round(g.atk*1.12);g.def=Math.round(g.def*1.12);g.value=Math.round(g.value*1.25);g.affixes=['保底精良','區域戰利品'];save.playtest.lootPity=0;notify('打寶保底發動：本次裝備提升為稀有品質。')}else if(g.rarity!=='common')save.playtest.lootPity=0;return g};
+const playtestZoneReward=resolveLootZone;resolveLootZone=function(){let before=battleState?.zoneRewarded;playtestZoneReward();if(!before&&battleState?.zoneRewarded){save.playtest.bossWins++;localStorage.setItem('cyber-crown-save',JSON.stringify(save))}};
+const playtestContentRender=renderContentPack;renderContentPack=function(){playtestContentRender();let btn=[...document.querySelectorAll('#contentPackSummary button')].find(x=>x.textContent.includes('突發事件'));if(btn&&save.playtest.incidentDay===save.day){btn.disabled=true;btn.textContent='今日事件已處理'}let note=document.getElementById('playtestStatus');if(!note){note=document.createElement('div');note.id='playtestStatus';note.className='phase-card';document.getElementById('contentPackSummary')?.appendChild(note)}if(note)note.innerHTML=`<h3>獵人紀錄</h3><p>已擊敗區域 Boss ${save.playtest.bossWins} 次 · 稀有掉落保底進度 ${save.playtest.lootPity} / 3</p>`};
+const playtestRender=render;render=function(){playtestRender();renderContentPack()};renderContentPack();
+})();
 </script>
 </body></html>
