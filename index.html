@@ -501,6 +501,7 @@ const phaseRender=render;render=function(){ensurePhaseData();phaseRender();rende
 const phaseAdvance=advanceTime;advanceTime=function(){phaseAdvance();addJournal('日常','進入第 '+save.day+' 天','城市局勢、商店與每日內容已刷新。');localStorage.setItem('cyber-crown-save',JSON.stringify(save))};
 addJournal('系統','三階段擴充完成','戰鬥結算、隊伍成長、技能配置、背包便利、城市地圖、完整日誌、產業經營、教學與存檔安全已啟用。');
 localStorage.setItem('cyber-crown-save',JSON.stringify(save));render();
+Object.assign(window,{renderProgression,renderCityMap,renderJournal,renderIndustryOps,renderSaveSafety,renderTutorial,gearPower,xpNeed});
 })();
 /* Image performance layer: lazy decoding, graceful fallback and paged card lists. */
 (function(){
