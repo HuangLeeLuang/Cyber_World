@@ -2,7 +2,15 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090d10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cyber World">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="public/pwa/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="public/pwa/icon-192.png">
   <title>賽博王冠｜傭兵生活 RPG</title>
   <style>
     :root{--bg:#090d10;--panel:#12191d;--line:#303a3e;--gold:#e6a84a;--muted:#91a0a4;--red:#b84b42}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#edf1ef;font-family:"Microsoft JhengHei",sans-serif}button,input,select{font:inherit}button{color:inherit;background:#151d21;border:1px solid var(--line);padding:10px 15px;cursor:pointer}button:hover,.active{border-color:var(--gold);color:var(--gold)}header{height:70px;display:flex;align-items:center;padding:0 5vw;border-bottom:1px solid var(--line);position:sticky;top:0;background:#090d10ee;z-index:5}.logo{margin-right:auto;color:var(--gold);font-weight:900;letter-spacing:3px}.logo small{display:block;color:var(--muted);font-size:10px}nav{display:flex;gap:6px}.money{margin-left:auto;color:var(--gold)}main{width:min(1350px,92vw);margin:auto}.page{display:none}.page.active-page{display:block}.hero{min-height:430px;margin-top:24px;padding:38px;display:flex;align-items:flex-end;border:1px solid var(--line);background:linear-gradient(90deg,#080c0edf 8%,#080c0e88 50%,transparent),linear-gradient(0deg,#080c0ecf,transparent 65%),url("public/cyber-refuge.webp") center/cover}.hero h1{font-size:clamp(42px,7vw,76px);margin:0}.hero p{max-width:560px;line-height:1.8;color:#cad1cf}.gold{background:var(--gold);color:#18120a;border-color:var(--gold);font-weight:900}.notice{padding:13px 18px;border:1px solid var(--line);border-top:0;color:var(--muted)}.notice b{color:#fff;margin-right:18px}.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:18px;margin-top:18px}.panel{padding:24px;border:1px solid var(--line);background:linear-gradient(145deg,#151d21,#0d1215)}.eyebrow{color:var(--gold);letter-spacing:3px;font-size:11px}.panel h2{margin:5px 0 20px}.venues{display:grid;grid-template-columns:1fr 1fr;gap:9px}.venues button{text-align:left}.venues b,.venues small{display:block}.venues small{color:var(--muted);margin-top:4px}.venues em{color:var(--gold);font-style:normal}.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.bar{height:5px;background:#334044;display:block;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold))}.mission{width:100%;display:flex;justify-content:space-between;text-align:left;margin-bottom:8px}.mission span{display:flex;flex-direction:column}.mission small{color:var(--muted)}.mission em{color:var(--gold);font-style:normal}.squad{margin-top:18px}.members{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.member{padding:12px;background:#0b1012;border:1px solid var(--line)}.portrait{height:100px;display:grid;place-items:center;font-size:38px;background:linear-gradient(145deg,#637076,#1a2225)}.member h3{margin:10px 0 2px}.member p,.member small{color:var(--muted);margin:0}.sub{padding:60px 0;min-height:80vh}.sub h1{font-size:52px;margin:5px 0}.lead{color:var(--muted);margin-bottom:32px}.guide{display:grid;grid-template-columns:180px 1fr;gap:18px}.guide aside button{display:block;width:100%;margin-bottom:7px;text-align:left}.tip{padding:18px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:45px 1fr}.tip b{color:var(--gold)}.editor{display:grid;grid-template-columns:1fr 1fr;gap:18px}.fields label{display:grid;grid-template-columns:1fr 180px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}input,select{background:#090d10;color:#fff;border:1px solid var(--line);padding:9px}.full{width:100%;margin-top:9px}.danger{border-color:var(--red);color:#ef867c}pre{background:#070a0c;color:#91a8aa;padding:15px;overflow:auto;max-height:260px}footer{border-top:1px solid var(--line);margin-top:40px;padding:26px 0 50px;color:var(--muted);font-size:12px}@media(max-width:800px){header{padding:0 10px}.logo small{display:none}.money{font-size:12px}nav button{padding:8px}.hero{padding:23px;min-height:500px}.grid,.guide,.editor{grid-template-columns:1fr}.members{display:flex;overflow:auto}.member{min-width:150px}.venues,.stats{grid-template-columns:1fr}.sub h1{font-size:40px}}
@@ -614,6 +622,32 @@ const rumorStories=[
 function openRumorStory(){let unseen=rumorStories.filter(x=>!save.expansionAudit.rumorsSeen.includes(x.id)),s=(unseen.length?unseen:rumorStories)[Math.floor(Math.random()*(unseen.length||rumorStories.length))];openDialogue({title:'城市傳聞：'+s.title,lines:[{speaker:'匿名線人',text:s.text},{speaker:displayName(0),portrait:portrait(0),text:'這不只是傳聞。選一條線追下去，總會有人留下破綻。'}],choices:s.choices.map((c,i)=>({label:c,note:i===0?'線索 +2':i===1?'居民信任 +2':'聲望 +2',action:()=>{if(i===0)save.worldStory.clues+=2;if(i===1)save.worldStory.citizens+=2;if(i===2)save.prestige=Math.min(100,save.prestige+2);if(!save.expansionAudit.rumorsSeen.includes(s.id))save.expansionAudit.rumorsSeen.push(s.id);addJournal('城市傳聞',s.title,c+'。這條線索將影響後續城市局勢。');persist()}}))})}window.openRumorStory=openRumorStory;
 const auditedStoryRender=renderWorldStory;renderWorldStory=function(){auditedStoryRender();let host=document.getElementById('worldStoryPanel');if(host&&!document.getElementById('rumorStoryBtn'))host.insertAdjacentHTML('beforeend',`<button id="rumorStoryBtn" onclick="openRumorStory()">調查新的城市傳聞</button><small>已完成傳聞 ${save.expansionAudit.rumorsSeen.length} / ${rumorStories.length} · 動態故事回聲 ${save.expansionAudit.storyEchoes}</small>`)};
 const auditRender=render;render=function(){auditRender();renderProgression();renderShop();renderWorldStory()};render();
+})();
+/* Complete PWA offline support for iPhone and installed browsers. */
+(function(){
+if(!save.pwa)save.pwa={installed:false,lastBackupReminder:0};
+let pwaState={supported:'serviceWorker'in navigator,online:navigator.onLine,ready:false,cached:0,version:'',update:false};
+function pwaNotify(text){if(typeof notify==='function')notify(text)}
+async function registerPWA(){
+ if(!pwaState.supported||location.protocol==='file:')return;
+ try{
+  const registration=await navigator.serviceWorker.register('./service-worker.js',{scope:'./'});
+  await navigator.serviceWorker.ready;pwaState.ready=true;
+  if(registration.waiting){pwaState.update=true;pwaNotify('遊戲有新版本，重新開啟後更新。')}
+  registration.addEventListener('updatefound',()=>{let worker=registration.installing;worker?.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller){pwaState.update=true;pwaNotify('新版已下載，可重新開啟遊戲。');renderPWAStatus()}})});
+  navigator.serviceWorker.controller?.postMessage({type:'CACHE_STATUS'});renderPWAStatus();
+ }catch(error){console.warn('PWA registration failed',error);renderPWAStatus()}
+}
+navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='CACHE_STATUS'){pwaState.cached=event.data.count;pwaState.version=event.data.version;renderPWAStatus()}});
+window.addEventListener('online',()=>{pwaState.online=true;pwaNotify('網路已恢復，將檢查遊戲更新。');navigator.serviceWorker?.getRegistration()?.then(r=>r?.update());renderPWAStatus()});
+window.addEventListener('offline',()=>{pwaState.online=false;pwaNotify('已切換為離線遊玩；進度仍會保存在本機。');renderPWAStatus()});
+window.addEventListener('appinstalled',()=>{save.pwa.installed=true;localStorage.setItem('cyber-crown-save',JSON.stringify(save));pwaNotify('Cyber World 已加入主畫面，可離線遊玩。');renderPWAStatus()});
+function refreshPWA(){navigator.serviceWorker?.getRegistration()?.then(r=>{if(r?.waiting){r.waiting.postMessage({type:'SKIP_WAITING'});location.reload()}else r?.update()})}window.refreshPWA=refreshPWA;
+function showIOSInstall(){alert('iPhone 安裝方式：\n1. 使用 Safari 開啟本頁\n2. 等待離線資源顯示「已就緒」\n3. 點 Safari 的分享按鈕\n4. 選擇「加入主畫面」\n5. 從主畫面圖示啟動遊戲\n\n建議定期在攻略頁匯出存檔到「檔案」App。')}window.showIOSInstall=showIOSInstall;
+function renderPWAStatus(){let parent=document.getElementById('guide')||document.body,host=document.getElementById('pwaStatusPanel');if(!host){host=document.createElement('article');host.id='pwaStatusPanel';host.className='panel phase-dashboard';parent.appendChild(host)}let standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;host.innerHTML=`<div class="eyebrow">OFFLINE APP</div><h2>iPhone 離線遊玩</h2><div class="phase-grid"><div class="phase-card"><small>網路狀態</small><b>${pwaState.online?'🟢 線上':'🟠 離線'}</b><p>${pwaState.online?'可檢查更新與補齊快取。':'正在使用裝置內的遊戲檔案。'}</p></div><div class="phase-card"><small>離線快取</small><b>${pwaState.ready?'✓ 已就緒':'準備中'}</b><p>已快取 ${pwaState.cached||'—'} 個檔案 ${pwaState.version?'· '+pwaState.version:''}</p></div><div class="phase-card"><small>安裝狀態</small><b>${standalone?'✓ 主畫面模式':'瀏覽器模式'}</b><p>${standalone?'目前以獨立遊戲視窗執行。':'加入主畫面後可像 App 一樣啟動。'}</p></div></div><div class="chip-row"><button onclick="showIOSInstall()">iPhone 安裝說明</button><button onclick="refreshPWA()">檢查遊戲更新</button><button onclick="exportSave()">備份存檔到檔案</button></div><p><small>注意：刪除 Safari 網站資料或 iPhone 儲存空間不足時，離線快取與本機存檔可能被清除。請定期匯出存檔。</small></p>`}
+const pwaRender=render;render=function(){pwaRender();renderPWAStatus()};
+let wantedPage=new URLSearchParams(location.search).get('page');if(wantedPage&&document.getElementById(wantedPage))setTimeout(()=>showPage(wantedPage),0);
+renderPWAStatus();registerPWA();
 })();
 </script>
 </body></html>

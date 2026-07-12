@@ -1,0 +1,24 @@
+{
+  "id": "./",
+  "name": "Cyber World：城市王冠",
+  "short_name": "Cyber World",
+  "description": "五人即時戰鬥、城市生活、產業經營與完整故事線的離線角色扮演遊戲。",
+  "lang": "zh-Hant",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#090d10",
+  "theme_color": "#090d10",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {"src":"public/pwa/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"public/pwa/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"public/pwa/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"城市生活","short_name":"城市","url":"./index.html?source=pwa&page=town","icons":[{"src":"public/pwa/icon-192.png","sizes":"192x192"}]},
+    {"name":"冒險與打寶","short_name":"冒險","url":"./index.html?source=pwa&page=adventure","icons":[{"src":"public/pwa/icon-192.png","sizes":"192x192"}]}
+  ]
+}
