@@ -922,7 +922,8 @@ let legacyNavCss=document.createElement('style');legacyNavCss.textContent='heade
 /* Remove the legacy menu from the DOM and use direct hub switching for reliable navigation. */
 function purgeLegacyNavigation(){document.querySelectorAll('header nav>button').forEach(button=>button.remove())}
 function openPrimaryHub(id){let page=document.getElementById(id);if(!page)return;document.querySelectorAll('.page').forEach(node=>node.classList.remove('active-page'));page.classList.add('active-page');purgeLegacyNavigation();render();document.querySelectorAll('#hubNavigation button').forEach(button=>button.classList.toggle('active',button.textContent===({town:'今日',party:'隊伍',actionHub:'行動',cityHub:'城市',moreHub:'更多'}[hubForPage(id)])))}
-window.openHub=openPrimaryHub;
+buildUnifiedNav=function(){};
+openHub=openPrimaryHub;window.openHub=openPrimaryHub;
 const legacyCompactify=compactifyUi;compactifyUi=function(){legacyCompactify();purgeLegacyNavigation()};
 purgeLegacyNavigation();render();
 renderCombatOptions();renderBattle();
