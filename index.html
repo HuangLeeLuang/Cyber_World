@@ -800,6 +800,7 @@ const rebornRender=render;render=function(){rebornRender();renderRebornCampaign(
 })();
 /* Full-body combat presentation and unarmed combat system — phases 1-4. */
 (function(){
+if(typeof window.awardXP!=='function')window.awardXP=function(amount,reason){save.progression=save.progression||{level:1,xp:0,points:0,skills:[],equipped:[]};save.progression.xp=(save.progression.xp||0)+amount;while(save.progression.xp>=save.progression.level*100){save.progression.xp-=save.progression.level*100;save.progression.level++;save.progression.points=(save.progression.points||0)+1}if(typeof addJournal==='function'&&reason)addJournal('成長紀錄',reason,'獲得 '+amount+' 經驗。')};
 const EMPTY_HAND={id:'unarmed',name:'空手',slot:'weapon',atk:4,def:1,note:'武器欄留空時自動使用。出手快，擅長打斷與控制。'};
 const heroBodies=['kaide','mila','tiexiong','suyan','zero'].map(x=>'public/battle-bodies/heroes/'+x+'.webp');
 const enemyBodies=['street-thug','pistol-merc','shield-trooper','shotgunner','sniper','enemy-medic','heavy-gunner'];
