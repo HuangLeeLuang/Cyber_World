@@ -923,9 +923,11 @@ let legacyNavCss=document.createElement('style');legacyNavCss.textContent='heade
 function purgeLegacyNavigation(){document.querySelectorAll('header nav>button').forEach(button=>button.remove())}
 function openPrimaryHub(id){let page=document.getElementById(id);if(!page)return;document.querySelectorAll('.page').forEach(node=>node.classList.remove('active-page'));page.classList.add('active-page');purgeLegacyNavigation();render();document.querySelectorAll('#hubNavigation button').forEach(button=>button.classList.toggle('active',button.textContent===({town:'今日',party:'隊伍',actionHub:'行動',cityHub:'城市',moreHub:'更多'}[hubForPage(id)])))}
 buildUnifiedNav=function(){};
-openHub=openPrimaryHub;window.openHub=openPrimaryHub;
+function switchPrimary(id){let page=document.getElementById(id);if(!page)return;document.querySelectorAll('.page').forEach(node=>node.classList.remove('active-page'));page.classList.add('active-page');if(id==='party')renderPartyHub();if(id==='town')renderTodaySimple();document.getElementById('commandDeck')?.setAttribute('hidden','');purgeLegacyNavigation();document.querySelectorAll('#hubNavigation button').forEach(button=>button.classList.toggle('active',button.dataset.primary===id))}
+function buildPrimaryNavigation(){let nav=document.querySelector('header nav');if(!nav)return;let host=document.getElementById('hubNavigation');if(!host){host=document.createElement('div');host.id='hubNavigation';host.className='hub-nav';nav.prepend(host)}host.innerHTML=[['town','今日'],['party','隊伍'],['actionHub','行動'],['cityHub','城市'],['moreHub','更多']].map(([id,label])=>`<button data-primary="${id}" onclick="switchPrimary('${id}')">${label}</button>`).join('');purgeLegacyNavigation()}
+window.switchPrimary=switchPrimary;openHub=switchPrimary;window.openHub=switchPrimary;
 const legacyCompactify=compactifyUi;compactifyUi=function(){legacyCompactify();purgeLegacyNavigation()};
-purgeLegacyNavigation();render();
+buildPrimaryNavigation();purgeLegacyNavigation();
 renderCombatOptions();renderBattle();
 })();
 </script>
