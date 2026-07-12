@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <rect width="1280" height="640" fill="#00ff00"/>
+  <defs>
+    <style>
+      .label{font:18px Arial,sans-serif;fill:#111}
+      .skin{fill:#f3d7cf;stroke:#231820;stroke-width:3}
+      .hair{fill:#151018;stroke:#09060a;stroke-width:3}
+      .top{fill:#1d1e28;stroke:#0b0b10;stroke-width:3}
+      .skirt{fill:#16131f;stroke:#07060a;stroke-width:3}
+      .shorts{fill:#242433;stroke:#0d0d15;stroke-width:2}
+      .shoe{fill:#efefef;stroke:#151515;stroke-width:3}
+      .accent{stroke:#ff4fb8;stroke-width:3;fill:none}
+      .line{stroke:#231820;stroke-width:7;stroke-linecap:round}
+      .motion{stroke:#ff4fb8;stroke-width:5;stroke-linecap:round;fill:none;opacity:.9}
+    </style>
+    <g id="head">
+      <ellipse class="hair" cx="0" cy="-112" rx="28" ry="38"/>
+      <path class="hair" d="M-22-102 C-58-70-48-18-24 26 C-44-26-34-76-10-108Z"/>
+      <circle class="skin" cx="0" cy="-110" r="23"/>
+      <path class="hair" d="M-22-125 C-4-150 32-132 28-104 C10-118-6-121-22-104Z"/>
+    </g>
+    <g id="body">
+      <path class="top" d="M-30-78 L30-78 L24-18 L-24-18 Z"/>
+      <path class="skin" d="M-18-18 L18-18 L18 2 L-18 2 Z"/>
+      <path class="skirt" d="M-42 2 L42 2 L30 42 L-30 42 Z"/>
+      <path class="accent" d="M-28-64 L24-64"/>
+      <path class="shorts" d="M-24 38 L24 38 L18 58 L-18 58 Z"/>
+    </g>
+    <g id="fighter-idle">
+      <use href="#head"/>
+      <use href="#body"/>
+      <path class="line" d="M-28-62 L-62-26"/>
+      <path class="line" d="M28-62 L64-32"/>
+      <path class="line" d="M-18 48 L-35 122"/>
+      <path class="line" d="M18 48 L44 122"/>
+      <ellipse class="shoe" cx="-40" cy="130" rx="25" ry="9"/>
+      <ellipse class="shoe" cx="50" cy="130" rx="25" ry="9"/>
+    </g>
+  </defs>
+
+  <g transform="translate(80 36)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">待機 1</text><g transform="translate(80 138)"><use href="#fighter-idle"/></g></g>
+  <g transform="translate(240 36)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">待機 2</text><g transform="translate(82 140) rotate(-2)"><use href="#fighter-idle"/></g></g>
+  <g transform="translate(400 36)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">前踏</text><g transform="translate(86 142)"><use href="#head"/><use href="#body"/><path class="line" d="M-28-62 L-58-18"/><path class="line" d="M28-62 L70-38"/><path class="line" d="M-18 48 L-56 118"/><path class="line" d="M18 48 L62 104"/><ellipse class="shoe" cx="-62" cy="126" rx="25" ry="9"/><ellipse class="shoe" cx="70" cy="112" rx="25" ry="9"/></g></g>
+  <g transform="translate(560 36)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">出拳預備</text><g transform="translate(80 140)"><use href="#head"/><use href="#body"/><path class="line" d="M-28-62 L-72-42"/><path class="line" d="M28-62 L56-70"/><path class="line" d="M-18 48 L-42 122"/><path class="line" d="M18 48 L42 122"/><ellipse class="shoe" cx="-48" cy="130" rx="25" ry="9"/><ellipse class="shoe" cx="48" cy="130" rx="25" ry="9"/></g></g>
+  <g transform="translate(80 334)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">直拳</text><g transform="translate(78 142)"><use href="#head"/><use href="#body"/><path class="line" d="M-28-62 L-56-20"/><path class="line" d="M28-62 L92-64"/><path class="motion" d="M86-84 C116-74 116-52 88-42"/><path class="line" d="M-18 48 L-38 122"/><path class="line" d="M18 48 L48 122"/><ellipse class="shoe" cx="-44" cy="130" rx="25" ry="9"/><ellipse class="shoe" cx="56" cy="130" rx="25" ry="9"/></g></g>
+  <g transform="translate(240 334)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">迴旋踢</text><g transform="translate(78 144) rotate(-8)"><use href="#head"/><use href="#body"/><path class="line" d="M-28-62 L-58-34"/><path class="line" d="M28-62 L62-34"/><path class="line" d="M-18 48 L-50 116"/><path class="line" d="M18 48 L108 18"/><path class="motion" d="M74 2 C112-12 136 12 112 42"/><ellipse class="shoe" cx="-56" cy="124" rx="25" ry="9"/><ellipse class="shoe" cx="116" cy="14" rx="25" ry="9"/></g></g>
+  <g transform="translate(400 334)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">受擊</text><g transform="translate(82 148) rotate(10)"><use href="#head"/><use href="#body"/><path class="line" d="M-28-62 L-70-64"/><path class="line" d="M28-62 L58-22"/><path class="line" d="M-18 48 L-50 120"/><path class="line" d="M18 48 L36 124"/><ellipse class="shoe" cx="-56" cy="128" rx="25" ry="9"/><ellipse class="shoe" cx="42" cy="132" rx="25" ry="9"/></g></g>
+  <g transform="translate(560 334)"><rect x="0" y="0" width="160" height="270" fill="none" stroke="#111" stroke-width="2"/><text class="label" x="12" y="28">倒地</text><g transform="translate(80 178) rotate(82)"><use href="#head"/><use href="#body"/><path class="line" d="M-28-62 L-66-48"/><path class="line" d="M28-62 L64-38"/><path class="line" d="M-18 48 L-46 122"/><path class="line" d="M18 48 L42 122"/><ellipse class="shoe" cx="-52" cy="130" rx="25" ry="9"/><ellipse class="shoe" cx="48" cy="130" rx="25" ry="9"/></g></g>
+
+  <g transform="translate(760 80)">
+    <rect x="0" y="0" width="420" height="480" rx="14" fill="#101018" opacity=".92"/>
+    <text x="28" y="54" font-family="Arial,sans-serif" font-size="30" fill="#fff">女性空手版設計稿</text>
+    <text x="28" y="104" font-family="Arial,sans-serif" font-size="22" fill="#ffaad8">成年、長髮、白膚、短裙、短筒運動鞋</text>
+    <text x="28" y="154" font-family="Arial,sans-serif" font-size="20" fill="#ddd">方向：</text>
+    <text x="28" y="198" font-family="Arial,sans-serif" font-size="20" fill="#ddd">1. 等身比例，不做 Q 版。</text>
+    <text x="28" y="238" font-family="Arial,sans-serif" font-size="20" fill="#ddd">2. 空手招式包含直拳與迴旋踢。</text>
+    <text x="28" y="278" font-family="Arial,sans-serif" font-size="20" fill="#ddd">3. 裙裝下保留安全短褲，方便戰鬥動畫。</text>
+    <text x="28" y="318" font-family="Arial,sans-serif" font-size="20" fill="#ddd">4. 之後 AI 正式稿會把線條、臉、髮絲補精緻。</text>
+    <text x="28" y="384" font-family="Arial,sans-serif" font-size="18" fill="#9be7ff">這張是工具失敗後的本地概念預覽，</text>
+    <text x="28" y="416" font-family="Arial,sans-serif" font-size="18" fill="#9be7ff">用來先確認服裝與動作方向。</text>
+  </g>
+</svg>
