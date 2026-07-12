@@ -758,9 +758,10 @@ const phase345Render=render;render=function(){phase345Render();renderRelationshi
 /* Reborn campaign: fresh save, one-person start, staged recruitment and system unlocking. */
 (function(){
 const REBORN_KEY='cyber-crown-reborn-save';
-if(!save.campaignReborn){
- save.campaignReborn={version:1,stage:0,recruited:['凱德'],unlocks:['town','battle','guide','mod'],completed:[],barRecruits:[],introSeen:false};
+if(!save.campaignReborn||save.campaignReborn.version<2){
+ save.campaignReborn={version:2,stage:0,recruited:['凱德'],unlocks:['town','battle','guide','mod'],completed:[],barRecruits:[],introSeen:false};
  save.credits=1200;save.day=1;save.time='上午';save.vitality=82;save.morale=55;save.contacts=0;save.prestige=0;save.gear=[];save.pendingLoot=[];save.industries={};save.luxuries=[];save.vehicle=null;save.residence='老舊出租套房';save.adventure.chapter=0;save.progression={level:1,xp:0,points:0,choices:[],skills:['burst'],equipped:['burst'],ai:'balanced'};
+ save.lifeSim={fullness:35,stress:10,statuses:[],homeUsed:{},messages:[],replied:[],lastMessageDay:0,weekly:{week:1,tasks:{social:0,meal:0,home:0,drive:0}},calendarSeen:[]};save.lifePhase2={calendarDone:{},vehicleUsed:{},luxuryUsed:{},outfit:'casual',socialLog:[],eventsCompleted:0};save.relationshipLife={profiles:{},daily:{},visits:[],history:[],couples:[],conflicts:[]};save.homeLife={rooms:{bedroom:1},furniture:[],displays:[],eventDay:0,security:0,comfort:0,parties:0};save.citySimulation={day:0,weather:'晴朗',news:[],market:1,districts:{central:{security:55,prosperity:60},harbor:{security:38,prosperity:52},oldtown:{security:45,prosperity:48},heights:{security:72,prosperity:78},frontier:{security:25,prosperity:32}},npcLocations:{},industryEvent:null,history:[]};
  let starter=inventory.find(x=>x.id==='v9')||inventory.find(x=>x.slot==='weapon');save.owned=starter?[starter.id]:[];save.equipment=Array.from({length:5},(_,i)=>({weapon:i===0&&starter?starter.id:null,armor:null,accessory:null}));
  localStorage.setItem(REBORN_KEY,JSON.stringify(save));
 }
