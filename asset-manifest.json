@@ -283,5 +283,8 @@
     "public/battle-sprites/enemies/shotgunner.png",
     "public/battle-sprites/enemies/sniper.png",
     "public/battle-sprites/enemies/enemy-medic.png",
-    "public/battle-sprites/enemies/heavy-gunner.png"
+    "public/battle-sprites/enemies/heavy-gunner.png",
+    "public/items/gauntlets/swift-gauntlets.webp",
+    "public/items/gauntlets/breaker-gauntlets.webp",
+    "public/items/gauntlets/guardian-gauntlets.webp"
 ]
