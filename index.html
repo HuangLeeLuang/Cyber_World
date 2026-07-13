@@ -456,6 +456,7 @@ const style=document.createElement('style');style.textContent=`
 `;document.head.appendChild(style);
 
 function addJournal(type,title,text){ensurePhaseData();let key=type+'|'+title+'|'+text;if(save.storyJournal.entries[0]?.key===key)return;save.storyJournal.entries.unshift({key,type,title,text,day:save.day,time:Date.now()});save.storyJournal.entries=save.storyJournal.entries.slice(0,80)}
+window.addJournal=addJournal;
 function awardXP(amount,reason){ensurePhaseData();let p=save.progression;p.xp+=amount;addJournal('成長',reason,'獲得 '+amount+' 經驗');while(p.level<30&&p.xp>=xpNeed(p.level)){p.xp-=xpNeed(p.level);p.level++;p.points++;save.credits+=p.level*250;notify('等級提升至 Lv.'+p.level+'，獲得 1 點成長點數。')}localStorage.setItem('cyber-crown-reborn-save',JSON.stringify(save))}
 function spendGrowth(stat){let p=save.progression;if(p.points<1)return notify('沒有可用的成長點數。');p.points--;p.choices.push(stat);if(save.career?.abilities?.[stat]!=null)save.career.abilities[stat]=Math.min(100,save.career.abilities[stat]+2);else if(stat==='vitality')save.vitality=Math.min(100,save.vitality+8);else save.morale=Math.min(100,save.morale+8);persist()}
 function toggleSkill(id){let p=save.progression,i=p.equipped.indexOf(id);if(i>=0)p.equipped.splice(i,1);else if(p.equipped.length<2)p.equipped.push(id);else return notify('最多裝備兩項技能。');persist()}
