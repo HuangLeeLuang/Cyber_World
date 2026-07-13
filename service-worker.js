@@ -1,4 +1,4 @@
-const CACHE_VERSION='cyber-world-v68';
+const CACHE_VERSION='cyber-world-v69';
 const CORE=['./','./index.html','./manifest.webmanifest','./asset-manifest.json','./public/pwa/icon-192.png','./public/pwa/icon-512.png','./public/pwa/icon-maskable-512.png','./public/pwa/apple-touch-icon.png'];
 
 self.addEventListener('install',event=>{
