@@ -965,6 +965,21 @@ ensureDirectPartyPage();renderDirectParty();renderActionCategories();buildPrimar
 // and fall back to Today during startup.
 [0,80,300].forEach(delay=>setTimeout(syncTargetPage,delay));
 window.addEventListener('load',syncTargetPage);
+// 玩家介面繁體中文化：保留品牌英文副標，其餘識別標籤優先顯示中文。
+const traditionalUiText={
+ 'REAL-TIME COMBAT':'即時戰鬥','FIELD MANUAL':'傭兵手冊','SAVE EDITOR':'存檔工具','MISSION LOOT':'任務戰利品',
+ 'INDUSTRY EVENT':'產業事件','CITY CHRONICLES':'城市記事','STORY':'主線故事','DAILY CONTRACTS':'每日委託',
+ 'WANTED':'懸賞任務','GARAGE & HOME':'車庫與住宅','SALVAGE':'裝備拆解','CITY LIFE':'城市生活',
+ 'OFFICER LIFE MODE':'武將生涯模式','MONTHLY ACTIONS':'本月行動','RELATIONSHIPS':'人物關係','CITY MARKET':'城市商店',
+ 'OFFLINE APP':'離線應用程式','LIVING CITY':'生活城市','CITY SOCIAL CALENDAR':'城市社交日曆',
+ 'AUTONOMOUS CITY':'城市動態','TODAY':'今日','TODAY\'S COMMAND':'今日建議','OPERATIONS':'行動',
+ 'PROGRESSION':'成長','MORE':'更多','SQUAD COMMAND':'隊伍指揮','BATTLE VISUALS':'戰鬥畫面','REBORN TOOLS':'重生工具'
+};
+function localizeVisibleUi(root=document){root.querySelectorAll?.('.eyebrow').forEach(node=>{let key=node.textContent.trim();if(traditionalUiText[key])node.textContent=traditionalUiText[key]});root.querySelectorAll?.('.stage-center').forEach(node=>{if(node.textContent.trim()==='COMBAT')node.textContent='交戰中'});let logo=document.querySelector('.logo');if(logo&&logo.firstChild?.nodeType===3&&logo.firstChild.nodeValue.trim()==='CYBER CROWN')logo.firstChild.nodeValue='賽博王冠 ';}
+const chineseUiObserver=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)localizeVisibleUi(node)})));chineseUiObserver.observe(document.body,{childList:true,subtree:true});localizeVisibleUi();
+guides['手機戰鬥操作']=['手機直向時，我方隊伍顯示在上方、敵方隊伍顯示在下方；角色攻擊時不會自動移動畫面。','人物列超出螢幕時可自行左右滑動。行動者會高亮，受擊者會顯示紅色提示，方便辨識戰況。','戰鬥操作集中在畫面下方附近。若手機效能不足，可在攻略頁的「戰鬥動畫設定」開啟精簡動態。'];
+guides['修改器使用方式']=['一般欄位可修改信用點、遊戲天數、體力、精神、聲望、人脈、住宅與車輛；修改後必須按「套用修改」。','進階資料包含主線章節、拆解零件、每日連續完成、武卷、防卷、新遊戲＋與威脅難度。直接跳過章節可能略過部分對話與獎勵。','修改前請先「複製存檔備份」。恢復初始存檔或清除重生存檔都無法復原，會重新從單人序章開始。'];
+let updatedModHelp=document.getElementById('updatedModHelp');if(!updatedModHelp){updatedModHelp=document.createElement('article');updatedModHelp.id='updatedModHelp';updatedModHelp.className='panel';document.getElementById('mod').appendChild(updatedModHelp)}updatedModHelp.innerHTML='<div class="eyebrow">修改器說明</div><h2>修改與備份</h2><p>先複製存檔備份，再調整數值並按「套用修改」。解鎖全部系統不會刪除現有物品；恢復初始存檔與清除重生進度則無法復原。</p><p><b>提醒：</b>直接提高主線章節可能跳過招募、對話與章節獎勵。若要保留完整故事體驗，建議只調整資源與難度。</p>';
 renderCombatOptions();renderBattle();
 })();
 </script>
