@@ -938,7 +938,12 @@ function switchPrimary(id){let page=id==='party'?ensureDirectPartyPage():documen
 function buildPrimaryNavigation(){let nav=document.querySelector('header nav');if(!nav)return;let host=document.getElementById('hubNavigation');if(!host){host=document.createElement('div');host.id='hubNavigation';host.className='hub-nav';nav.prepend(host)}host.innerHTML=[['town','今日'],['party','隊伍'],['actionHub','行動'],['cityHub','城市'],['moreHub','更多']].map(([id,label])=>`<a data-primary="${id}" href="#${id}">${label}</a>`).join('');purgeLegacyNavigation()}
 window.switchPrimary=switchPrimary;openHub=switchPrimary;window.openHub=switchPrimary;
 const legacyCompactify=compactifyUi;compactifyUi=function(){legacyCompactify();purgeLegacyNavigation()};
-ensureDirectPartyPage();renderDirectParty();renderActionCategories();buildPrimaryNavigation();purgeLegacyNavigation();setTimeout(syncTargetPage,0);
+ensureDirectPartyPage();renderDirectParty();renderActionCategories();buildPrimaryNavigation();purgeLegacyNavigation();
+// Several legacy render wrappers finish on the next animation frame. Re-apply the
+// requested primary page after those wrappers settle so #actionHub cannot flash
+// and fall back to Today during startup.
+[0,80,300].forEach(delay=>setTimeout(syncTargetPage,delay));
+window.addEventListener('load',syncTargetPage);
 renderCombatOptions();renderBattle();
 })();
 </script>
