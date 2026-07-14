@@ -1007,6 +1007,22 @@ const qualityShopRenderBase=renderShop;renderShop=function(){qualityShopRenderBa
 const toolsRenderBase=render;render=function(){toolsRenderBase();renderGearMaker();renderQualityShop()};
 guides['品質商店與製作']=['武器店與防具店每天各會展示不同品質裝備，包含普通、稀有、史詩與傳奇；購買後直接進入背包。','同型號商品會有不同攻防、價格與隨機詞綴，每日刷新後重新產生。','修改器的裝備製作工具可指定基礎型號、品質及 +0～+15 強化值。直接製作不消耗信用點。'];
 let layoutFix=document.createElement('style');layoutFix.textContent=`.battle-actor{padding-top:25px}.actor-bars{top:2px}.quality-shop{margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}.quality-shop .item img{width:100%;height:130px;object-fit:cover;margin-bottom:8px}.maker-fields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:12px 0}.maker-fields label{display:grid;gap:5px}@media(max-width:900px) and (orientation:landscape){.battle-actor{padding-top:28px}.actor-bars{top:2px}.actor-bars b{font-size:10px}.mini-hp{height:7px}}@media(max-width:700px) and (orientation:portrait){.actor-figure,.battle-actor.boss .actor-figure{margin-top:0}.battle-actor{padding-top:28px}}@media(max-width:600px){.maker-fields{grid-template-columns:1fr}}.stage-line.enemies{flex-direction:row}.stage-line.enemies .boss{order:-1}`;document.head.appendChild(layoutFix);
+
+// 資產入口：住宅與車輛屬於城市生活，不再混在主線任務頁中。
+function ensureAssetManagementPage(){
+ let main=document.querySelector('main'),page=document.getElementById('assets');
+ if(!page){page=document.createElement('section');page.id='assets';page.className='page sub';page.innerHTML='<div class="eyebrow">城市資產</div><h1>車輛與住宅</h1><p class="lead">購買後永久持有，可隨時免費切換目前使用的車輛或住宅。</p>';main.appendChild(page)}
+ let assetGrid=document.getElementById('assetGrid'),assetPanel=assetGrid?.closest('article.panel');
+ if(assetPanel&&assetPanel.parentElement!==page)page.appendChild(assetPanel);
+ let cityGrid=document.querySelector('#cityHub .hub-grid');
+ if(cityGrid&&!cityGrid.querySelector('[data-city-assets]')){
+  cityGrid.querySelectorAll('button').forEach(button=>{if(button.textContent.includes('產業與資產')){button.querySelector('b').textContent='產業經營';button.querySelector('small').textContent='被動收入、經理與產業事件'}});
+  cityGrid.insertAdjacentHTML('beforeend','<button data-city-assets onclick="switchPrimary(\'assets\');history.replaceState(null,\'\',\'#assets\')"><b>車輛與住宅</b><small>購買、持有與切換城市資產</small></button>')
+ }
+}
+const assetPageRenderBase=render;render=function(){assetPageRenderBase();ensureAssetManagementPage()};
+guides['購買住宅與車輛']=['從上方「城市」進入「車輛與住宅」，即可查看所有資產、價格與效果。','信用點足夠時按「購買並使用」；已購買的資產永久持有，之後切換不再收費。','住宅可改善休息、委託獎金、產業收入與住宅空間；車輛則提供戰鬥或打寶加成。'];
+ensureAssetManagementPage();
 renderGearMaker();renderDirectParty();
 renderCombatOptions();renderBattle();
 })();
