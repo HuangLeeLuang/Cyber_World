@@ -4,7 +4,7 @@
   "short_name": "Cyber World",
   "description": "五人即時戰鬥、城市生活、產業經營與完整故事線的離線角色扮演遊戲。",
   "lang": "zh-Hant",
-  "start_url": "./index.html?source=pwa",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
