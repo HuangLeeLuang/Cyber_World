@@ -499,7 +499,7 @@ function safeSave(){ensurePhaseData();let raw=JSON.stringify(save),current=local
 function restoreBackup(n){let raw=localStorage.getItem('cyber-crown-backup-'+n);if(!raw)return notify('這個備份尚不存在。');if(!confirm('確定還原備份 '+n+'？目前進度會先被保存。'))return;localStorage.setItem('cyber-crown-reborn-save',raw);location.reload()}
 window.safeSave=safeSave;window.restoreBackup=restoreBackup;
 function renderSaveSafety(){let host=document.getElementById('phaseSaveSafety');if(!host){host=document.createElement('article');host.id='phaseSaveSafety';host.className='panel phase-dashboard';(document.getElementById('settings')||document.getElementById('guide')).appendChild(host)}host.innerHTML=`<div class="eyebrow">SAVE SAFETY v${CW_VERSION}</div><h2>存檔安全中心</h2><p>自動相容舊存檔，並可保留最近兩次手動安全存檔。</p><div class="chip-row"><button onclick="safeSave()">立即安全存檔</button><button onclick="restoreBackup(1)">還原上一份</button><button onclick="restoreBackup(2)">還原更早備份</button></div>`}
-function renderTutorial(){if(save.tutorial.done)return document.getElementById('tutorialCoach')?.remove();let steps=[['歡迎來到 Cyber World','先從「城市生活」查看區域與地點。'],['整備五人小隊','到隊伍與裝備頁選擇隊友、武器與兩項戰術技能。'],['接受第一份委託','前往冒險，任務勝利後會依序顯示經驗、戰利品與故事影響。'],['建立自己的生活','吃飯、娛樂、住宅、車輛與產業都會影響戰鬥或收入。']];let i=Math.min(save.tutorial.step,steps.length-1),h=document.getElementById('tutorialCoach');if(!h){h=document.createElement('div');h.id='tutorialCoach';h.className='tutorial-coach';document.body.appendChild(h)}h.innerHTML=`<small>新手引導 ${i+1} / ${steps.length}</small><h3>${steps[i][0]}</h3><p>${steps[i][1]}</p><button onclick="save.tutorial.step++;if(save.tutorial.step>=${steps.length})save.tutorial.done=true;persist()">${i===steps.length-1?'完成引導':'下一步'}</button><button onclick="save.tutorial.done=true;persist()">略過</button>`}
+function renderTutorial(){if(save.tutorial.done)return document.getElementById('tutorialCoach')?.remove();let steps=[['歡迎來到 Cyber World','先從「生活」查看生命、體力、精神、飽足與壓力，並使用推薦行動。'],['整備目前隊伍','到「隊伍」切換人物，再從裝備分頁前往管理武器、防具與飾品。'],['接受第一份任務','前往「任務」選擇主線；解鎖後會逐步出現支線、委託、打寶與 Boss。'],['建立自己的生活','「購買」集中商店、背包、強化與資產；「經營」集中產業收入與事件。']];let i=Math.min(save.tutorial.step,steps.length-1),h=document.getElementById('tutorialCoach');if(!h){h=document.createElement('div');h.id='tutorialCoach';h.className='tutorial-coach';document.body.appendChild(h)}h.innerHTML=`<small>新手引導 ${i+1} / ${steps.length}</small><h3>${steps[i][0]}</h3><p>${steps[i][1]}</p><button onclick="save.tutorial.step++;if(save.tutorial.step>=${steps.length})save.tutorial.done=true;persist()">${i===steps.length-1?'完成引導':'下一步'}</button><button onclick="save.tutorial.done=true;persist()">略過</button>`}
 
 const phaseRender=render;render=function(){ensurePhaseData();phaseRender();renderProgression();renderCityMap();renderJournal();renderIndustryOps();renderSaveSafety();renderTutorial();ensureBattleTelemetry()};
 const phaseAdvance=advanceTime;advanceTime=function(){phaseAdvance();addJournal('日常','進入第 '+save.day+' 天','城市局勢、商店與每日內容已刷新。');localStorage.setItem('cyber-crown-reborn-save',JSON.stringify(save))};
@@ -788,7 +788,7 @@ const rebornRarityRoll=rollRarity;rollRarity=function(level){let r=rebornRarityR
 function isUnlocked(id){return campaign().unlocks.includes('all')||campaign().unlocks.includes(id)||['town','battle','guide','mod'].includes(id)}window.isUnlocked=isUnlocked;
 function startRebornChapter(){let c=campaignStages[campaign().stage];if(!c)return notify('重生主線已完成，城市進入自由模式。');openDialogue({title:c.title,image:c.image,noVariation:true,noStoryEcho:true,lines:[{speaker:'章節敘事',text:c.story},{speaker:displayName(0),portrait:portrait(0),text:'我會從這裡開始。不是因為已經準備好，而是因為沒有人能再等。'}],choices:[{label:'開始任務',note:'建議隊伍 '+c.people+' 人 · 敵人強度 Lv.'+c.level,action:()=>launchRebornChapter(c)},{label:'稍後準備',note:'返回城市整理裝備',action:()=>showPage('town')}]})}window.startRebornChapter=startRebornChapter;
 function launchRebornChapter(c){selectedMission=Math.min(2,Math.max(0,c.level-1));showPage('battle');startBattle();battleState.rebornStage=campaign().stage;battleState.allies=battleState.allies.slice(0,c.people);let count=Math.min(c.enemies.length,Math.max(1,c.people+1)),baseHp=38+c.level*17;battleState.enemies=Array.from({length:count},(_,i)=>({name:c.enemies[i]||'武裝敵人',hp:baseHp+(i===count-1?c.level*18:0),max:baseHp+(i===count-1?c.level*18:0),atk:5+c.level*2,gauge:Math.random()*28,role:i===count-1?'隊長':'普通'}));battleState.phaseStart=Date.now();battleTitle.textContent=c.title;battleLog.textContent='故事戰鬥開始。現有隊伍：'+c.people+' 人。';renderBattle()}
-function showRebornUnlock(c){let text=[];if(c.recruit)text.push(c.recruit+' 加入隊伍');c.unlock.forEach(x=>text.push('解鎖：'+unlockLabels[x]));ensureClearModal();clearTitle.textContent='章節完成 · '+c.title;clearImage.src=c.image;clearCopy.textContent=c.story;clearRewards.innerHTML=text.map(x=>`<div><b>${x}</b></div>`).join('');clearActions.innerHTML='<button onclick="chapterClearModal.hidden=true;showPage(\'town\')">回到城市</button>';chapterClearModal.hidden=false}
+function showRebornUnlock(c){let text=[];if(c.recruit)text.push(c.recruit+' 加入隊伍');c.unlock.forEach(x=>text.push('解鎖：'+unlockLabels[x]));ensureClearModal();clearTitle.textContent='章節完成 · '+c.title;clearImage.src=c.image;clearCopy.textContent=c.story;clearRewards.innerHTML=text.map(x=>`<div><b>${x}</b></div>`).join('');clearClaimBtn.textContent='回到生活';clearClaimBtn.onclick=()=>{chapterClearModal.hidden=true;window.v2SwitchPrimary?window.v2SwitchPrimary('lifeCenter'):showPage('town')};chapterClearModal.hidden=false}
 function completeRebornStage(index){if(campaign().completed.includes(index))return;let c=campaignStages[index];campaign().completed.push(index);if(c.recruit&&!campaign().recruited.includes(c.recruit))campaign().recruited.push(c.recruit);c.unlock.forEach(x=>{if(!campaign().unlocks.includes(x))campaign().unlocks.push(x)});campaign().stage=Math.min(campaignStages.length,index+1);campaign().pendingUnlock=index;save.credits=Math.max(0,save.credits-(missionData[selectedMission]?.[2]||0));save.credits+=700+c.level*450;awardXP(55+c.level*25,'完成 '+c.title);addJournal('重生主線',c.title,'隊伍擴張至 '+Math.min(5,c.people+(c.recruit?1:0))+' 人。'+c.reward);localStorage.setItem(REBORN_KEY,JSON.stringify(save));if(!save.pendingLoot?.length)revealRebornUnlock();render()}
 function revealRebornUnlock(){let i=campaign().pendingUnlock;if(i===undefined||i===null)return;campaign().pendingUnlock=null;localStorage.setItem(REBORN_KEY,JSON.stringify(save));showRebornUnlock(campaignStages[i])}
 const smoothCollectLoot=collectAllLoot;collectAllLoot=function(){smoothCollectLoot();revealRebornUnlock()};const smoothSellLoot=sellAllLoot;sellAllLoot=function(){smoothSellLoot();revealRebornUnlock()};const smoothCloseLoot=closeLoot;closeLoot=function(){smoothCloseLoot();revealRebornUnlock()};
@@ -1023,6 +1023,300 @@ function ensureAssetManagementPage(){
 const assetPageRenderBase=render;render=function(){assetPageRenderBase();ensureAssetManagementPage()};
 guides['購買住宅與車輛']=['從上方「城市」進入「車輛與住宅」，即可查看所有資產、價格與效果。','信用點足夠時按「購買並使用」；已購買的資產永久持有，之後切換不再收費。','住宅可改善休息、委託獎金、產業收入與住宅空間；車輛則提供戰鬥或打寶加成。'];
 ensureAssetManagementPage();
+
+/* 2026 interface: organize the game by player intent. */
+var v2Ui={primary:sessionStorage.getItem('cw-primary')||'lifeCenter',missionTab:sessionStorage.getItem('cw-mission-tab')||'story',partyTab:sessionStorage.getItem('cw-party-tab')||'summary',scrolls:{}};
+if(save.health===undefined)save.health=Math.min(100,Math.max(1,save.vitality));
+var v2PrimaryMap={lifeCenter:'生活',missionCenter:'任務',purchaseCenter:'購買',industry:'經營',party:'隊伍'};
+var v2CampaignInfo=[
+ {title:'序章：一個人的雨夜',people:1,image:'public/stories/story-1.webp',story:'你在雨巷看見居民被持刀暴徒追趕，王冠計畫第一次闖進你的生活。',enemies:['街頭暴徒','持刀追蹤者']},
+ {title:'第一章：屋頂上的神射手',people:1,image:'public/stories/story-2.webp',story:'證人被困在屋頂，米菈正獨自壓制追兵。',enemies:['手槍傭兵','企業追蹤者','傭兵隊長']},
+ {title:'第二章：鐵熊的舊債',people:2,image:'public/stories/story-3.webp',story:'地下拳場的鐵熊被迫替幫派還債，真正的敵人藏在觀眾席後方。',enemies:['霰彈槍手','盾牌兵','拳場莊家']},
+ {title:'第三章：慈悲街不熄燈',people:3,image:'public/stories/story-4.webp',story:'診所拒絕交出居民名冊，武裝人員包圍了整條街。',enemies:['鎮暴盾兵','敵方醫護兵','高樓狙擊手','清場隊長']},
+ {title:'第四章：零號通緝令',people:4,image:'public/stories/story-5.webp',story:'零號正在獵殺王冠執行官，你必須先證明彼此不是敵人。',enemies:['精英殺手','重裝槍手','王冠處刑人']},
+ {title:'第五章：王冠之下的城市',people:5,image:'public/stories/story-6.webp',story:'五個人站上同一條戰線，城市的命運將在最後一役決定。',enemies:['王冠精英','敵方指揮官','重裝處刑者','王冠代理人']}
+];
+var v2LootInfo=[
+ {id:'armory',name:'地下軍火庫',desc:'廢棄軍火庫，主要取得手槍、彈藥與軍規零件。',image:'public/loot-zones/underground-armory.webp',level:2,cost:8,boss:'軍火商「鐵犬」',drops:['cobra-pistol','ammo-rig']},
+ {id:'precinct',name:'廢棄警署',desc:'失守的舊警署，主要取得防具、鎮暴武器與證物。',image:'public/loot-zones/abandoned-precinct.webp',level:3,cost:10,boss:'腐敗警長「灰犬」',drops:['riot-shotgun','riot-armor','old-watch']},
+ {id:'vault',name:'富豪保險庫',desc:'高風險奢華區，能找到飾品、藝術品與高價收藏。',image:'public/loot-zones/luxury-vault.webp',level:3,cost:12,boss:'保險庫管家「白手套」',drops:['old-watch','ronin-charm','detective-coat']},
+ {id:'port',name:'港口貨櫃區',desc:'走私貨櫃每天更換，掉落種類最隨機。',image:'public/loot-zones/container-port.webp',level:4,cost:14,boss:'港區霸主「鐵鯊」',drops:['hunter-vest','ronin-blade','ammo-rig']},
+ {id:'subway',name:'地下首領競技場',desc:'最高難度連戰，可取得反器材步槍與套裝核心。',image:'public/loot-zones/boss-arena.webp',level:5,cost:18,boss:'王冠執行者「黑曜」',drops:['anti-materiel','riot-armor','ronin-coat']}
+];
+function v2Unlocked(id){return typeof window.isUnlocked==='function'?window.isUnlocked(id):true}
+function v2EnsurePages(){
+ let main=document.querySelector('main');
+ if(!document.getElementById('lifeCenter'))main.insertAdjacentHTML('afterbegin','<section id="lifeCenter" class="page sub v2-page"><div id="v2Life"></div></section>');
+ if(!document.getElementById('missionCenter'))main.insertAdjacentHTML('afterbegin','<section id="missionCenter" class="page sub v2-page"><div id="v2Missions"></div></section>');
+ if(!document.getElementById('purchaseCenter'))main.insertAdjacentHTML('afterbegin','<section id="purchaseCenter" class="page sub v2-page"><div id="v2Purchase"></div></section>');
+ if(!document.getElementById('v2Settings'))document.body.insertAdjacentHTML('beforeend',`<div id="v2Settings" class="hub-modal" hidden><div class="hub-window v2-settings"><button class="v2-close" type="button">關閉</button><div class="eyebrow">系統選單</div><h2>攻略、存檔與設定</h2><div class="v2-menu-list"><button data-v2-page="guide"><b>遊戲攻略</b><small>玩法、能力與系統說明</small></button><button data-v2-page="mod"><b>修改器</b><small>修改與備份本機存檔</small></button><button type="button" onclick="exportSave()"><b>匯出存檔</b><small>下載一份本機備份</small></button><button type="button" onclick="document.getElementById('saveImportFile').click()"><b>匯入存檔</b><small>載入之前匯出的存檔</small></button><button type="button" onclick="prepareOffline()"><b>準備完整離線資料</b><small>下載圖片與遊戲檔案供離線使用</small></button></div></div></div>`);
+ let settings=document.getElementById('v2Settings');
+ settings.querySelector('.v2-close').onclick=()=>settings.hidden=true;
+ settings.querySelectorAll('[data-v2-page]').forEach(b=>b.onclick=()=>{settings.hidden=true;v2OpenPage(b.dataset.v2Page,'settings')});
+ settings.onclick=e=>{if(e.target===settings)settings.hidden=true};
+}
+function v2PrimaryAvailable(id){
+ if(id==='purchaseCenter')return v2Unlocked('shop')||v2Unlocked('inventory');
+ if(id==='industry')return v2Unlocked('industry');
+ return true
+}
+function v2BuildNavigation(){
+ let nav=document.querySelector('header nav'),host=document.getElementById('hubNavigation');
+ if(!host){host=document.createElement('div');host.id='hubNavigation';host.className='hub-nav';nav.prepend(host)}
+ host.innerHTML=Object.entries(v2PrimaryMap).filter(([id])=>v2PrimaryAvailable(id)).map(([id,label])=>`<button type="button" data-v2-primary="${id}">${label}<span class="v2-nav-badge" hidden></span></button>`).join('');
+ host.querySelectorAll('[data-v2-primary]').forEach(b=>b.onclick=()=>v2SwitchPrimary(b.dataset.v2Primary));
+ let gear=document.getElementById('v2GearButton');
+ if(!gear){gear=document.createElement('button');gear.id='v2GearButton';gear.className='v2-gear';gear.type='button';gear.setAttribute('aria-label','開啟設定');gear.textContent='⚙';gear.onclick=()=>document.getElementById('v2Settings').hidden=false;document.querySelector('header').appendChild(gear)}
+ v2UpdateNavigation()
+}
+function v2PrimaryForPage(id){
+ if(['lifeCenter','town'].includes(id))return'lifeCenter';
+ if(['missionCenter','adventure','battle'].includes(id))return'missionCenter';
+ if(['purchaseCenter','shop','inventory','forge','assets'].includes(id))return'purchaseCenter';
+ if(id==='industry')return'industry';
+ if(['party','career'].includes(id))return'party';
+ return v2Ui.primary
+}
+function v2RememberScroll(){
+ let active=document.querySelector('.page.active-page');
+ if(active)v2Ui.scrolls[active.id]=window.scrollY
+}
+function v2Activate(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active-page',p.id===id));
+ requestAnimationFrame(()=>window.scrollTo(0,v2Ui.scrolls[id]||0))
+}
+function v2SwitchPrimary(id){
+ if(!v2PrimaryAvailable(id))return;
+ v2RememberScroll();v2Ui.primary=id;sessionStorage.setItem('cw-primary',id);
+ if(id==='lifeCenter')v2RenderLife();
+ if(id==='missionCenter')v2RenderMissions();
+ if(id==='purchaseCenter')v2RenderPurchase();
+ if(id==='party')v2RenderParty();
+ if(id==='industry'){renderIndustry();window.renderIndustryOps?.()}
+ v2Activate(id);history.replaceState(null,'','#'+id);v2UpdateNavigation()
+}
+function v2OpenPage(id,source){
+ v2RememberScroll();if(source!=='settings')v2Ui.primary=v2PrimaryMap[source]?source:v2PrimaryForPage(id);
+ if(id==='shop')renderShop();if(id==='inventory')renderInventory();if(id==='forge')renderForge();if(id==='party')v2RenderParty();if(id==='industry')renderIndustry();
+ let page=document.getElementById(id);if(page&&v2PrimaryMap[source])page.dataset.v2Back=source;
+ v2Activate(id);history.replaceState(null,'','#'+id);v2InjectBack(id);v2UpdateNavigation()
+}
+function v2InjectBack(id){
+ let page=document.getElementById(id);if(!page||v2PrimaryMap[id])return;
+ let primary=page.dataset.v2Back||v2PrimaryForPage(id),label=v2PrimaryMap[primary]||'返回',back=page.querySelector('.v2-backbar');
+ if(!back){page.insertAdjacentHTML('afterbegin','<button class="v2-backbar" type="button"></button>');back=page.querySelector('.v2-backbar')}
+ back.textContent='‹ 返回'+label;back.onclick=()=>v2SwitchPrimary(primary)
+}
+function v2TodoItems(){
+ ensureDaily();let a=save.adventure,daily=(a.dailyGoals||[]).filter(id=>{let x=dailyTaskCatalog.find(v=>v.id===id);return x&&(a.daily[id]||0)>=x.need&&!a.claimed.includes(id)}).length;
+ return[
+  daily?['missionCenter',daily+' 項委託獎勵可領']:null,
+  save.pendingLoot?.length?['purchaseCenter',save.pendingLoot.length+' 件戰利品待處理']:null,
+  save.pendingIndustryEvents?.length?['industry',save.pendingIndustryEvents.length+' 件產業事件']:null,
+  (save.lifeSim?.messages||[]).filter(m=>!save.lifeSim.replied.includes(m.id)).length?['town','有新訊息待回覆']:null
+ ].filter(Boolean)
+}
+function v2StatusData(){
+ let life=save.lifeSim||{};
+ return[['生命',save.health,'越高越好'],['體力',save.vitality,'越高越好'],['精神',save.morale,'越高越好'],['飽足',life.fullness??35,'維持 40～90'],['壓力',life.stress??10,'越低越好']]
+}
+function v2RecommendedLife(){
+ let life=save.lifeSim||{},r=[];
+ if(save.health<75)r.push(['診所治療','生命 +35、體力 +28、醫療包 +1、₡480','clinic','public/location-clinic.webp']);
+ if((life.fullness??35)<65)r.push(['食堂用餐','飽足淨增約 +23、體力 +16、精神 +3、₡180','diner','public/location-diner.webp']);
+ if((life.stress??10)>35)r.push(['在家睡眠','體力 +30、精神 +15、壓力 -25','sleep','public/location-home.webp']);
+ if(save.morale<65)r.push(['酒吧放鬆','精神 +12、人脈 +2、₡120','bar','public/location-bar.webp']);
+ if(r.length<3)r.push(['空中公園散步','精神 +18、人脈 +1、免費','park','public/location-park.webp']);
+ if(r.length<3)r.push(['住宅休息','體力 +22、精神 +6、免費','home','public/location-home.webp']);
+ return r.slice(0,3)
+}
+function v2RunLifeAction(id){
+ if(id==='town')return v2OpenPage('town','lifeCenter');
+ if(id==='medkit'){if(!(save.items.medkit||0))return notify('醫療包不足。');save.items.medkit--;save.health=Math.min(100,save.health+25);save.vitality=Math.min(100,save.vitality+10);notify('使用醫療包：生命 +25、體力 +10。');persist();return}
+ let data={
+  clinic:{cost:480,health:35,vit:28,item:'medkit',label:'慈悲街診所',msg:'生命 +35、體力 +28、醫療包 +1'},
+  diner:{cost:180,vit:16,mor:3,full:32,label:'食堂熱食',msg:'飽足淨增約 +23、體力 +16、精神 +3',hours:['上午','下午','夜晚']},
+  bar:{cost:120,mor:12,con:2,label:'灰犬酒館',msg:'精神 +12、人脈 +2',hours:['夜晚','深夜']},
+  club:{cost:900,mor:10,pre:4,con:3,label:'上城俱樂部',msg:'精神 +10、聲望 +4、人脈 +3',hours:['夜晚']},
+  home:{cost:0,vit:22,mor:6,label:'住宅休息',msg:'體力 +22、精神 +6',hours:['上午','下午','夜晚','深夜']},
+  park:{cost:0,mor:18,con:1,label:'空中公園',msg:'精神 +18、人脈 +1'},
+  sleep:{cost:0,vit:30,mor:15,stress:-25,label:'好好睡一覺',msg:'體力 +30、精神 +15、壓力 -25'}
+ }[id];
+ if(!data)return notify('找不到這項生活行動。');
+ if(data.hours&&!data.hours.includes(save.time))return notify('目前是'+save.time+'，這項活動尚未開放。');
+ if(save.credits<data.cost)return notify('信用點不足。');
+ save.credits-=data.cost;save.health=Math.min(100,save.health+(data.health||0));save.vitality=Math.min(100,save.vitality+(data.vit||0));save.morale=Math.min(100,save.morale+(data.mor||0));save.contacts=Math.min(100,save.contacts+(data.con||0));save.prestige=Math.min(100,save.prestige+(data.pre||0));
+ if(data.item)save.items[data.item]=(save.items[data.item]||0)+1;
+ if(data.full!==undefined)save.lifeSim.fullness=Math.min(100,(save.lifeSim.fullness||0)+data.full);
+ if(data.stress!==undefined)save.lifeSim.stress=Math.max(0,Math.min(100,(save.lifeSim.stress||0)+data.stress));
+ ensureDaily();save.adventure.daily.venue=(save.adventure.daily.venue||0)+1;if(save.lifeSim.weekly?.tasks){if(id==='diner')save.lifeSim.weekly.tasks.meal++;else save.lifeSim.weekly.tasks.home++}
+ advanceTime();if(typeof addJournal==='function')addJournal('生活',data.label,data.msg);notify(data.label+'：'+data.msg+'。');persist()
+}
+function v2RenderLife(){
+ let host=document.getElementById('v2Life');if(!host)return;let todos=v2TodoItems(),logs=(save.storyJournal?.entries||[]).filter(x=>/生活|住宅|隊友日常|奢侈/.test(x.type)).slice(0,6);
+ let all=[
+  ['慈悲街診所','生命 +35、體力 +28、醫療包 +1 · ₡480','clinic'],
+  ['食堂熱食','飽足淨增約 +23、體力 +16、精神 +3 · ₡180','diner'],
+  ['灰犬酒館','精神 +12、人脈 +2 · ₡120','bar'],
+  ['上城俱樂部','精神 +10、聲望 +4、人脈 +3 · ₡900','club'],
+  ['住宅休息','體力 +22、精神 +6 · 免費','home'],
+  ['空中公園','精神 +18、人脈 +1 · 免費','park'],
+  ['使用醫療包','生命 +25、體力 +10 · 持有 '+(save.items.medkit||0),'medkit'],
+  ['住宅生活','睡眠、洗澡、聚會與收藏','town']
+ ];
+ host.innerHTML=`<div class="v2-page-head"><div><div class="eyebrow">生活與狀態</div><h1>現在需要補充什麼？</h1><p>第 ${save.day} 日 · ${save.time}　信用點 ₡${save.credits.toLocaleString()}</p></div></div>
+ <section class="v2-todos ${todos.length?'':'is-clear'}"><b>${todos.length?'待辦事項':'目前沒有待辦事項'}</b><div>${todos.map(([id,text])=>`<button data-todo="${id}">${text}<em>前往 ›</em></button>`).join('')||'<span>可以自由安排生活或推進任務。</span>'}</div></section>
+ <section class="v2-status-grid">${v2StatusData().map(([n,v,h])=>`<article><header><b>${n}</b><em>${Math.round(v)}/100</em></header><span class="v2-meter ${n==='壓力'?'reverse':''}"><i style="width:${Math.max(0,Math.min(100,v))}%"></i></span><small>${h}</small></article>`).join('')}</section>
+ <div class="v2-section-title"><div><div class="eyebrow">系統建議</div><h2>推薦行動</h2></div><small>點擊後立即執行</small></div>
+ <section class="v2-feature-cards">${v2RecommendedLife().map(([n,d,a,img])=>`<button class="v2-feature" data-life-action="${a}"><img src="${img}" alt=""><span><b>${n}</b><small>${d}</small></span><em>立即執行</em></button>`).join('')}</section>
+ <details class="v2-all-actions"><summary>查看全部生活功能</summary><div class="v2-compact-list">${all.map(([n,d,a])=>`<button data-life-action="${a}"><span><b>${n}</b><small>${d}</small></span><em>執行 ›</em></button>`).join('')}</div></details>
+ <details class="v2-life-log"><summary>生活紀錄</summary>${logs.length?logs.map(x=>`<p><small>第 ${x.day} 天 · ${x.title}</small>${x.text}</p>`).join(''):'<p>尚無生活紀錄。</p>'}</details>`;
+ host.querySelectorAll('[data-life-action]').forEach(b=>b.onclick=()=>v2RunLifeAction(b.dataset.lifeAction));
+ host.querySelectorAll('[data-todo]').forEach(b=>b.onclick=()=>{let id=b.dataset.todo;if(v2PrimaryMap[id])v2SwitchPrimary(id);else v2OpenPage(id,'lifeCenter')})
+}
+function v2MissionTabs(){
+ let stage=save.campaignReborn?.stage||0;
+ return[['story','主線',true],['side','支線',stage>=1],['contract','委託',stage>=1],['loot','打寶',stage>=2],['boss','Boss',stage>=2]].filter(x=>x[2])
+}
+function v2StartBasicMission(i){selectedMission=i;v2OpenPage('battle','missionCenter');startBattle()}
+function v2StartCurrentStory(){
+ if(typeof window.startRebornChapter!=='function')return notify('主線目前無法開始。');
+ window.startRebornChapter();setTimeout(()=>document.querySelector('#dialogueModal .dialogue-choices button,#dialogueChoices button')?.click(),0)
+}
+function v2StartSide(id){
+ let card=document.querySelector(`#casePanel button[onclick*="${id}"]`);if(card){card.click();setTimeout(()=>document.querySelector('#dialogueModal .dialogue-choices button,#dialogueChoices button')?.click(),0)}else notify('支線資料尚未準備完成。')
+}
+function v2StartLoot(id){
+ window.openLootZone?.(id);setTimeout(()=>document.querySelector('#dialogueModal .dialogue-choices button,#dialogueChoices button')?.click(),0)
+}
+function v2RenderMissions(){
+ let host=document.getElementById('v2Missions');if(!host)return;let tabs=v2MissionTabs();if(!tabs.some(x=>x[0]===v2Ui.missionTab))v2Ui.missionTab=tabs[0][0];
+ let content='';
+ if(v2Ui.missionTab==='story'){
+  let stage=save.campaignReborn?.stage||0,c=v2CampaignInfo[stage];
+  content=c?`<button class="v2-mission-card featured" data-story-start><img src="${c.image}" alt=""><span><small>目前主線 · 建議 ${c.people} 人</small><h2>${c.title}</h2><p>${c.story}</p><b>敵人：${c.enemies.join('、')}</b><em>點擊立即開始</em></span></button>`:'<article class="panel"><h2>重生主線已完成</h2><p>城市已進入自由模式。</p></article>'
+ }else if(v2Ui.missionTab==='side'){
+  content=generatedCases().map(x=>`<button class="v2-mission-card" data-side-id="${x.id}"><span><small>${x.client} · ${x.place}</small><h3>${x.title}</h3><p>${x.text}</p><b>敵人強度 Lv.${x.level}　獎勵 ₡${x.reward.toLocaleString()}</b><em>點擊立即出擊</em></span></button>`).join('')
+ }else if(v2Ui.missionTab==='contract'){
+  ensureDaily();let a=save.adventure,goals=(a.dailyGoals||[]).map(id=>dailyTaskCatalog.find(x=>x.id===id)).filter(Boolean);
+  let daily=`<section class="v2-daily-strip"><div><div class="eyebrow">每日委託</div><h2>今日進度</h2></div>${goals.map(x=>{let v=a.daily[x.id]||0,done=a.claimed.includes(x.id);return`<article><b>${x.name}</b><span>${Math.min(v,x.need)} / ${x.need}</span><button data-claim-daily="${x.id}" data-reward="${x.reward}" ${v<x.need||done?'disabled':''}>${done?'已領取':'領取 ₡'+x.reward}</button></article>`}).join('')}</section>`;
+  content=daily+missionData.map((x,i)=>`<button class="v2-mission-card" data-basic-mission="${i}"><span><small>${x[1]}</small><h3>${x[0]}</h3><p>敵方：武裝傭兵、敵方隊長　可能掉落：隨機品質裝備</p><b>難度 ${i+1}　獎勵 ₡${x[2].toLocaleString()}　體力消耗 0</b><em>點擊立即出擊</em></span></button>`).join('')
+ }else if(v2Ui.missionTab==='loot'){
+  content=v2LootInfo.map(z=>`<button class="v2-mission-card has-image" data-loot-id="${z.id}"><img src="${z.image}" alt=""><span><small>打寶區域 · Lv.${z.level}</small><h3>${z.name}</h3><p>${z.desc}</p><b>Boss：${z.boss}<br>掉落：${z.drops.map(id=>getBase(id)?.name||id).join('、')}<br>體力 ${z.cost}</b><em>點擊立即出擊</em></span></button>`).join('')
+ }else{
+  content=bountyCatalog.map(x=>`<button class="v2-mission-card" data-bounty-id="${x.id}" ${save.adventure.completedBounties.includes(x.id)?'disabled':''}><span><small>懸賞 Boss · Lv.${x.level}</small><h3>${x.name}</h3><p>${x.note}</p><b>敵人：首領與武裝護衛　獎勵 ₡${x.reward.toLocaleString()}</b><em>${save.adventure.completedBounties.includes(x.id)?'已擊敗':'點擊立即出擊'}</em></span></button>`).join('')
+ }
+ host.innerHTML=`<div class="v2-page-head"><div><div class="eyebrow">任務與戰鬥</div><h1>選擇要挑戰的目標</h1><p>卡片已列出敵人、難度、消耗、掉落與獎勵；點擊後直接出擊。</p></div></div><nav class="v2-tabs">${tabs.map(([id,n])=>`<button data-mission-tab="${id}" class="${v2Ui.missionTab===id?'active':''}">${n}</button>`).join('')}</nav><section class="v2-mission-list">${content}</section>`;
+ host.querySelectorAll('[data-mission-tab]').forEach(b=>b.onclick=()=>{v2Ui.missionTab=b.dataset.missionTab;sessionStorage.setItem('cw-mission-tab',v2Ui.missionTab);v2RenderMissions()});
+ host.querySelector('[data-story-start]')?.addEventListener('click',v2StartCurrentStory);
+ host.querySelectorAll('[data-basic-mission]').forEach(b=>b.onclick=()=>v2StartBasicMission(Number(b.dataset.basicMission)));
+ host.querySelectorAll('[data-side-id]').forEach(b=>b.onclick=()=>v2StartSide(b.dataset.sideId));
+ host.querySelectorAll('[data-loot-id]').forEach(b=>b.onclick=()=>v2StartLoot(b.dataset.lootId));
+ host.querySelectorAll('[data-bounty-id]').forEach(b=>b.onclick=()=>startBounty(b.dataset.bountyId))
+}
+function v2RenderPurchase(){
+ let host=document.getElementById('v2Purchase');if(!host)return;
+ let entries=[
+  ['shop','商店','武器、防具、飾品、消耗品與奢侈品','public/location-market.webp',v2Unlocked('shop')],
+  ['inventory','背包','查看戰利品、消耗品與所有持有物','public/item-supplies.webp',v2Unlocked('inventory')],
+  ['inventory','裝備','替每名隊員配置武器、防具與飾品','public/item-armor.webp',v2Unlocked('inventory')],
+  ['forge','強化','武卷、防卷、安定值、保護與修復','public/items/weapon-scroll.webp',v2Unlocked('forge')],
+  ['assets','資產','購買與切換住宅、車輛','public/assets/home-apartment.png',true]
+ ].filter(x=>x[4]);
+ host.innerHTML=`<div class="v2-page-head"><div><div class="eyebrow">購買與裝備</div><h1>想處理哪一類物品？</h1><p>信用點 ₡${save.credits.toLocaleString()}　背包裝備 ${save.gear.length+save.owned.length} 件　待處理戰利品 ${save.pendingLoot.length} 件</p></div></div><section class="v2-purchase-grid">${entries.map(([id,n,d,img])=>`<button data-purchase-page="${id}"><img src="${img}" alt=""><span><b>${n}</b><small>${d}</small></span><em>進入 ›</em></button>`).join('')}</section>`;
+ host.querySelectorAll('[data-purchase-page]').forEach(b=>b.onclick=()=>v2OpenPage(b.dataset.purchasePage,'purchaseCenter'))
+}
+function v2EnhanceShop(){
+ let shop=document.getElementById('shop');if(!shop)return;let panel=shop.querySelector('.shop-layout article'),tools=document.getElementById('v2ShopTools');
+ if(!tools){tools=document.createElement('div');tools.id='v2ShopTools';tools.className='v2-shop-tools';tools.innerHTML='<input id="v2ShopSearch" type="search" placeholder="搜尋物品名稱"><select id="v2ShopFilter"><option value="all">全部商品</option><option value="affordable">買得起</option><option value="upgrade">比目前裝備強</option><option value="rare">稀有以上</option><option value="unowned">尚未擁有</option></select>';panel.insertBefore(tools,document.getElementById('shopItems'))}
+ let apply=()=>{let q=document.getElementById('v2ShopSearch').value.trim().toLowerCase(),f=document.getElementById('v2ShopFilter').value;document.querySelectorAll('#shopItems .item').forEach(el=>{let text=el.textContent.toLowerCase(),price=Number((text.match(/₡([0-9,]+)/)||[])[1]?.replaceAll(',',''))||0,button=el.querySelector('button'),rare=/稀有|史詩|傳奇/.test(text),upgrade=/攻\s*(\d+)|防\s*(\d+)/.test(text),show=(!q||text.includes(q))&&(f==='all'||f==='affordable'&&price<=save.credits||f==='upgrade'&&upgrade||f==='rare'&&rare||f==='unowned'&&button&&!button.disabled);el.hidden=!show})};
+ tools.querySelector('input').oninput=apply;tools.querySelector('select').onchange=apply;apply()
+}
+var v2LegacyShopRender=renderShop;renderShop=function(){v2LegacyShopRender();v2EnhanceShop()};window.renderShop=renderShop;
+function v2RenderIndustryHeader(){
+ let page=document.getElementById('industry'),owned=industryCatalog.filter(x=>save.industries[x.id]),daily=owned.reduce((s,x)=>s+industryDaily(x,save.industries[x.id].level).net,0),events=save.pendingIndustryEvents.length;
+ let old=page.querySelector('.v2-business-head');if(old)old.remove();
+ page.insertAdjacentHTML('afterbegin',`<section class="v2-business-head"><div class="eyebrow">企業經營</div><h1>產業經營總覽</h1><div class="v2-business-summary"><article><small>持有產業</small><b>${owned.length}</b></article><article><small>預估每日收入</small><b>₡${daily.toLocaleString()}</b></article><article><small>待處理事件</small><b>${events}</b></article><button type="button" ${events?'':'disabled'} data-business-event>${events?'處理下一件事件':'收益已自動入帳'}</button></div><nav class="v2-tabs"><button class="active" data-business-view="owned">已持有產業</button><button data-business-view="market">可購買產業</button></nav></section>`);
+ page.querySelector('[data-business-event]')?.addEventListener('click',showNextIndustryEvent);
+ page.querySelectorAll('[data-business-view]').forEach(b=>b.onclick=()=>{page.dataset.businessView=b.dataset.businessView;page.querySelectorAll('[data-business-view]').forEach(x=>x.classList.toggle('active',x===b));v2FilterIndustries()});
+ page.dataset.businessView=page.dataset.businessView||'owned';v2FilterIndustries()
+}
+function v2FilterIndustries(){
+ let page=document.getElementById('industry'),view=page.dataset.businessView||'owned';
+ page.querySelectorAll('#industryGrid .industry-card').forEach(card=>{let owned=card.textContent.includes('持有中');card.hidden=view==='owned'?!owned:owned})
+}
+var v2IndustryRenderBase=renderIndustry;renderIndustry=function(){v2IndustryRenderBase();v2RenderIndustryHeader()};window.renderIndustry=renderIndustry;
+var v2BattleStartBase=startBattle;startBattle=function(){v2BattleStartBase();let hero=battleState?.allies?.[0];if(hero){hero.hp=Math.max(1,Math.round(hero.max*(save.health/100)));renderBattle()}};window.startBattle=startBattle;
+var v2BattleCheckBase=checkBattle;checkBattle=function(){let wasActive=battleState?.active,hero=battleState?.allies?.[0];v2BattleCheckBase();if(wasActive&&battleState&&!battleState.active&&hero&&!battleState.v2HealthSaved){battleState.v2HealthSaved=true;save.health=Math.max(0,Math.min(100,Math.round(hero.hp/hero.max*100)));localStorage.setItem('cyber-crown-reborn-save',JSON.stringify(save))}};window.checkBattle=checkBattle;
+function v2PartyContent(tab,i){
+ let c=save.career,a=c.abilities||{},eq=save.equipment?.[i]||{},h=heroStats(i),item=id=>id?getItem(id):null,w=item(eq.weapon),ar=item(eq.armor),ac=item(eq.accessory),labels={leadership:'統率',martial:'武力',intellect:'智略',business:'經營',charisma:'魅力',tech:'技術'};
+ if(tab==='abilities')return`<div class="ability-grid">${Object.entries(a).map(([k,v])=>`<div class="ability">${labels[k]||k}<b>${v}</b><span class="bar"><i style="width:${v}%"></i></span></div>`).join('')}</div>`;
+ if(tab==='equipment')return`<div class="v2-equipment">${[['武器',w],['防具',ar],['飾品',ac]].map(([n,x])=>`<article><small>${n}</small><b>${x?.name||'未裝備'}</b><span>${x?'攻 '+effectiveAtk(x)+'／防 '+effectiveDef(x):'尚未配置'}</span></article>`).join('')}</div><button class="gold" data-party-manage>管理 ${displayName(i)} 的裝備</button>`;
+ if(tab==='skills'){let equipped=save.progression?.equipped||[];return`<div class="v2-compact-list">${equipped.length?equipped.map(id=>{let x=(typeof skillCatalog!=='undefined'?skillCatalog:[]).find(s=>s.id===id);return`<article><b>${x?.name||id}</b><small>${x?.desc||'已裝備戰術技能'}</small></article>`}).join(''):'<p>尚未裝備戰術技能。</p>'}</div><button data-party-career>前往生涯與技能</button>`}
+ let rel=save.companionBonds||{};return`<div class="v2-compact-list">${Object.entries(rel).length?Object.entries(rel).map(([n,v])=>`<article><b>${n}</b><small>羈絆 ${v}/10</small></article>`).join(''):'<p>完成隊友活動後會建立羈絆紀錄。</p>'}</div><button data-party-career>查看人物關係與生涯</button>`
+}
+function v2RenderParty(){
+ let page=document.getElementById('party');if(!page)return;let i=Math.max(0,Math.min(squad.length-1,partyFocus)),active=typeof activePartySize==='function'?activePartySize():5,h=heroStats(i),life=save.lifeSim||{},tabs=[['summary','總覽'],['abilities','能力'],['equipment','裝備'],['skills','技能'],['relations','關係']];
+ page.innerHTML=`<div class="v2-page-head"><div><div class="eyebrow">隊伍與人物</div><h1>隊伍</h1><p>體力 ${save.vitality}　精神 ${save.morale}　飽足 ${Math.round(life.fullness??35)}　壓力 ${Math.round(life.stress??10)}　信用點 ₡${save.credits.toLocaleString()}</p></div></div>
+ <section class="v2-roster">${squad.slice(0,active).map((p,n)=>`<button data-v2-member="${n}" class="${n===i?'active':''}"><img src="${portrait(n)}" alt=""><span><b>${displayName(n)}</b><small>${p[1]}</small></span></button>`).join('')}</section>
+ <article class="panel v2-character"><img src="${portrait(i)}" alt=""><div><small>${squad[i][1]}</small><h2>${displayName(i)}</h2><p>戰力 ${h.atk+h.def}　攻擊 ${h.atk}　防禦 ${h.def}　最大 HP ${h.max}</p><button data-v2-rename>修改名字</button><button data-v2-portrait>上傳人物肖像</button></div></article>
+ <nav class="v2-tabs">${tabs.map(([id,n])=>`<button data-party-tab="${id}" class="${v2Ui.partyTab===id?'active':''}">${n}</button>`).join('')}</nav>
+ <section class="panel v2-party-detail">${v2Ui.partyTab==='summary'?`<div class="v2-equipment"><article><small>角色定位</small><b>${squad[i][1]}</b><span>目前可出戰</span></article><article><small>戰鬥能力</small><b>${h.atk+h.def}</b><span>攻 ${h.atk}／防 ${h.def}</span></article><article><small>主角功績</small><b>${save.career.merit||0}</b><span>${save.career.status||'自由傭兵'}</span></article></div>`:v2PartyContent(v2Ui.partyTab,i)}</section>`;
+ page.querySelectorAll('[data-v2-member]').forEach(b=>b.onclick=()=>{partyFocus=Number(b.dataset.v2Member);v2RenderParty()});
+ page.querySelectorAll('[data-party-tab]').forEach(b=>b.onclick=()=>{v2Ui.partyTab=b.dataset.partyTab;sessionStorage.setItem('cw-party-tab',v2Ui.partyTab);v2RenderParty()});
+ page.querySelector('[data-v2-rename]').onclick=()=>renameHero(i);page.querySelector('[data-v2-portrait]').onclick=()=>choosePortrait(i);
+ page.querySelector('[data-party-manage]')?.addEventListener('click',()=>{equipHero=i;v2OpenPage('inventory','party')});
+ page.querySelector('[data-party-career]')?.addEventListener('click',()=>v2OpenPage('career','party'))
+}
+function v2UpdateNavigation(){
+ let current=v2PrimaryForPage(document.querySelector('.page.active-page')?.id||v2Ui.primary),todos=v2TodoItems();
+ document.querySelectorAll('[data-v2-primary]').forEach(b=>{let id=b.dataset.v2Primary,count=todos.filter(x=>v2PrimaryForPage(x[0])===id).length,badge=b.querySelector('.v2-nav-badge');b.classList.toggle('active',id===current);badge.hidden=!count;badge.textContent=count||''})
+}
+function v2HandleClick(event){
+ let b=event.target.closest('button');if(!b)return;
+ let controlled=b.id==='v2GearButton'||b.matches('#v2Settings .v2-close')||b.matches('[data-v2-primary],[data-life-action],[data-todo],[data-mission-tab],[data-story-start],[data-basic-mission],[data-side-id],[data-loot-id],[data-bounty-id],[data-claim-daily],[data-purchase-page],[data-v2-page],[data-business-view],[data-business-event],[data-v2-member],[data-party-tab],[data-v2-rename],[data-v2-portrait],[data-party-manage],[data-party-career]');
+ if(controlled){event.preventDefault();event.stopImmediatePropagation()}
+ if(b.id==='v2GearButton'){document.getElementById('v2Settings').hidden=false;return}
+ if(b.matches('#v2Settings .v2-close')){document.getElementById('v2Settings').hidden=true;return}
+ if(b.dataset.v2Primary){event.preventDefault();v2SwitchPrimary(b.dataset.v2Primary);return}
+ if(b.dataset.lifeAction){event.preventDefault();v2RunLifeAction(b.dataset.lifeAction);return}
+ if(b.dataset.todo){event.preventDefault();let id=b.dataset.todo;if(v2PrimaryMap[id])v2SwitchPrimary(id);else v2OpenPage(id,'lifeCenter');return}
+ if(b.dataset.missionTab){event.preventDefault();v2Ui.missionTab=b.dataset.missionTab;sessionStorage.setItem('cw-mission-tab',v2Ui.missionTab);v2RenderMissions();return}
+ if(b.hasAttribute('data-story-start')){event.preventDefault();v2StartCurrentStory();return}
+ if(b.dataset.basicMission!==undefined){event.preventDefault();v2StartBasicMission(Number(b.dataset.basicMission));return}
+ if(b.dataset.sideId){event.preventDefault();v2StartSide(b.dataset.sideId);return}
+ if(b.dataset.lootId){event.preventDefault();v2StartLoot(b.dataset.lootId);return}
+ if(b.dataset.bountyId){event.preventDefault();startBounty(b.dataset.bountyId);return}
+ if(b.dataset.claimDaily){event.preventDefault();claimDaily(b.dataset.claimDaily,Number(b.dataset.reward));v2RenderMissions();return}
+ if(b.dataset.purchasePage){event.preventDefault();v2OpenPage(b.dataset.purchasePage,'purchaseCenter');return}
+ if(b.dataset.v2Page){event.preventDefault();document.getElementById('v2Settings').hidden=true;v2OpenPage(b.dataset.v2Page,'settings');return}
+ if(b.dataset.businessView){event.preventDefault();let page=document.getElementById('industry');page.dataset.businessView=b.dataset.businessView;page.querySelectorAll('[data-business-view]').forEach(x=>x.classList.toggle('active',x===b));v2FilterIndustries();return}
+ if(b.hasAttribute('data-business-event')){event.preventDefault();showNextIndustryEvent();return}
+ if(b.dataset.v2Member!==undefined){event.preventDefault();partyFocus=Number(b.dataset.v2Member);v2RenderParty();return}
+ if(b.dataset.partyTab){event.preventDefault();v2Ui.partyTab=b.dataset.partyTab;sessionStorage.setItem('cw-party-tab',v2Ui.partyTab);v2RenderParty();return}
+ if(b.hasAttribute('data-v2-rename')){event.preventDefault();renameHero(partyFocus);return}
+ if(b.hasAttribute('data-v2-portrait')){event.preventDefault();choosePortrait(partyFocus);return}
+ if(b.hasAttribute('data-party-manage')){event.preventDefault();equipHero=partyFocus;v2OpenPage('inventory','party');return}
+ if(b.hasAttribute('data-party-career')){event.preventDefault();v2OpenPage('career','party');return}
+}
+document.addEventListener('click',v2HandleClick,true);
+function v2Restore(){
+ v2EnsurePages();v2BuildNavigation();let hash=location.hash.slice(1),id=document.getElementById(hash)?hash:v2Ui.primary;
+ if(['town','actionHub','cityHub','moreHub','growthHub'].includes(id))id='lifeCenter';
+ if(v2PrimaryMap[id]&&!v2PrimaryAvailable(id))id='lifeCenter';
+ v2SwitchPrimary(id)
+}
+var v2RenderBase=render;render=function(){v2RenderBase();v2EnsurePages();v2BuildNavigation();v2RenderLife();v2RenderMissions();v2RenderPurchase();v2RenderIndustryHeader();if(document.getElementById('party')?.classList.contains('active-page'))v2RenderParty();v2UpdateNavigation()};window.render=render;
+var v2PersistBase=persist;persist=function(){v2PersistBase();v2RenderLife();v2RenderMissions();v2RenderPurchase();v2UpdateNavigation()};window.persist=persist;
+var v2UiCss=document.createElement('style');v2UiCss.textContent=`
+body.v2-ready{padding-bottom:0}.v2-page{max-width:1120px;margin:auto}.v2-page-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:20px}.v2-page-head h1{margin:4px 0;font-size:clamp(34px,6vw,58px)}.v2-page-head p{color:var(--muted);margin:4px 0}.v2-todos{display:grid;grid-template-columns:160px 1fr;gap:12px;align-items:start;padding:14px;border:1px solid #8b7048;background:#15150e;margin-bottom:16px}.v2-todos.is-clear{border-color:var(--line);background:#0d1417}.v2-todos>div{display:flex;gap:7px;flex-wrap:wrap}.v2-todos button{padding:7px 10px}.v2-todos em{color:var(--gold);font-style:normal;margin-left:8px}.v2-status-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.v2-status-grid article{padding:12px;background:#101719;border:1px solid var(--line)}.v2-status-grid header{display:flex;justify-content:space-between}.v2-status-grid em{font-style:normal;color:var(--gold)}.v2-status-grid small{display:block;color:var(--muted);margin-top:7px}.v2-meter{display:block;height:7px;background:#263236;margin-top:8px}.v2-meter i{display:block;height:100%;background:linear-gradient(90deg,#c05b4e,#e6a84a,#6bcf8d);transition:width .35s}.v2-meter.reverse i{background:linear-gradient(90deg,#6bcf8d,#e6a84a,#c05b4e)}.v2-section-title{display:flex;justify-content:space-between;align-items:end;margin:24px 0 10px}.v2-section-title h2{margin:4px 0}.v2-section-title small{color:var(--muted)}.v2-feature-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.v2-feature{padding:0;overflow:hidden;text-align:left}.v2-feature img{width:100%;height:130px;object-fit:cover}.v2-feature span{display:block;padding:12px}.v2-feature b,.v2-feature small{display:block}.v2-feature small{color:var(--muted);margin-top:5px}.v2-feature em{display:block;padding:0 12px 12px;color:var(--gold);font-style:normal}.v2-all-actions,.v2-life-log{margin-top:15px;border:1px solid var(--line);background:#0d1316}.v2-all-actions summary,.v2-life-log summary{padding:14px;cursor:pointer;color:var(--gold)}.v2-compact-list{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}.v2-compact-list>button,.v2-compact-list>article{display:flex;justify-content:space-between;text-align:left;background:#101719;border:0;padding:13px}.v2-compact-list b,.v2-compact-list small{display:block}.v2-compact-list small{color:var(--muted);margin-top:3px}.v2-compact-list em{font-style:normal;color:var(--gold)}.v2-life-log p{padding:10px 14px;margin:0;border-top:1px solid var(--line)}.v2-life-log small{display:block;color:var(--muted)}.v2-tabs{display:flex;gap:5px;margin:14px 0 18px;overflow:auto}.v2-tabs button{white-space:nowrap}.v2-mission-list{display:grid;gap:10px}.v2-daily-strip{display:grid;grid-template-columns:160px repeat(3,1fr);gap:8px;padding:13px;border:1px solid var(--line);background:#0d1316}.v2-daily-strip h2{margin:4px 0}.v2-daily-strip article{padding:10px;background:#101719}.v2-daily-strip article b,.v2-daily-strip article span{display:block}.v2-daily-strip article span{color:var(--muted);margin:4px 0}.v2-daily-strip article button{padding:6px 8px}.v2-mission-card{display:grid;grid-template-columns:1fr;text-align:left;padding:16px;border:1px solid var(--line);background:#101719}.v2-mission-card.has-image,.v2-mission-card.featured{grid-template-columns:210px 1fr;padding:0;overflow:hidden}.v2-mission-card img{width:100%;height:100%;min-height:180px;object-fit:cover}.v2-mission-card>span{padding:4px}.v2-mission-card.has-image>span,.v2-mission-card.featured>span{padding:18px}.v2-mission-card h2,.v2-mission-card h3{margin:5px 0}.v2-mission-card p{color:var(--muted);margin:6px 0}.v2-mission-card b{display:block}.v2-mission-card em{display:block;color:var(--gold);font-style:normal;margin-top:10px}.v2-purchase-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.v2-purchase-grid button{display:grid;grid-template-columns:115px 1fr auto;align-items:center;padding:0;text-align:left;overflow:hidden}.v2-purchase-grid img{width:115px;height:100px;object-fit:cover}.v2-purchase-grid span{padding:13px}.v2-purchase-grid b,.v2-purchase-grid small{display:block}.v2-purchase-grid b{font-size:19px;color:var(--gold)}.v2-purchase-grid small{color:var(--muted);margin-top:5px}.v2-purchase-grid em{font-style:normal;margin-right:14px}.v2-backbar{margin:0 0 18px}.v2-shop-tools{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin:12px 0 18px}.v2-business-head{margin-bottom:16px}#industry>.eyebrow,#industry>h1,#industry>.lead,#industry>#industrySummary{display:none}.v2-business-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.v2-business-summary article,.v2-business-summary button{padding:13px;border:1px solid var(--line);background:#101719}.v2-business-summary small,.v2-business-summary b{display:block}.v2-business-summary b{font-size:22px;color:var(--gold)}.v2-roster{display:flex;gap:7px;overflow:auto;margin-bottom:13px}.v2-roster button{display:flex;align-items:center;gap:8px;min-width:150px;text-align:left;padding:7px}.v2-roster img{width:44px;height:44px;object-fit:cover}.v2-roster b,.v2-roster small{display:block}.v2-roster small{color:var(--muted)}.v2-character{display:grid;grid-template-columns:125px 1fr;gap:18px;align-items:center}.v2-character>img{width:125px;height:125px;object-fit:cover;border:1px solid var(--gold)}.v2-character h2{margin:3px 0}.v2-equipment{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.v2-equipment article{padding:13px;background:#090d10}.v2-equipment small,.v2-equipment b,.v2-equipment span{display:block}.v2-equipment span{color:var(--muted);margin-top:4px}.v2-menu-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v2-menu-list button{text-align:left}.v2-menu-list b,.v2-menu-list small{display:block}.v2-menu-list small{color:var(--muted);margin-top:4px}.v2-close{float:right}.v2-gear{font-size:20px;padding:7px 11px}.hub-nav .v2-nav-badge{display:inline-block;margin-left:5px;min-width:17px;padding:1px 5px;border-radius:10px;background:var(--red);color:#fff;font-size:10px}.hub-nav .v2-nav-badge[hidden]{display:none}
+@media(max-width:900px){body.v2-ready{padding-bottom:72px}header{position:relative;padding-bottom:8px}header nav{position:static!important;width:auto!important;order:initial!important;padding:0!important;border:0!important;display:flex!important}.hub-nav{position:fixed;left:0;right:0;bottom:0;z-index:90;display:grid!important;grid-template-columns:repeat(5,1fr);gap:2px!important;padding:max(5px,env(safe-area-inset-bottom)) 5px;background:#090d10;border-top:1px solid var(--line)}.hub-nav button{padding:11px 3px;font-size:12px;border:0;border-top:2px solid transparent}.hub-nav button.active{border-top-color:var(--gold);background:#171c1d}.v2-gear{position:fixed;right:10px;top:10px;z-index:96}.money{margin-right:44px}.v2-status-grid{grid-template-columns:repeat(2,1fr)}.v2-status-grid article:last-child{grid-column:1/-1}.v2-todos{grid-template-columns:1fr}.v2-feature-cards{grid-template-columns:1fr}.v2-feature{display:grid;grid-template-columns:105px 1fr auto;align-items:center}.v2-feature img{width:105px;height:94px}.v2-feature em{padding:8px;font-size:11px}.v2-compact-list{grid-template-columns:1fr}.v2-mission-card.has-image,.v2-mission-card.featured{grid-template-columns:105px 1fr}.v2-mission-card img{min-height:150px}.v2-mission-card.has-image>span,.v2-mission-card.featured>span{padding:12px}.v2-purchase-grid{grid-template-columns:1fr}.v2-business-summary{grid-template-columns:1fr 1fr}.v2-character{grid-template-columns:84px 1fr;padding:14px}.v2-character>img{width:84px;height:100px}.v2-equipment{grid-template-columns:1fr}.v2-shop-tools{grid-template-columns:1fr}.v2-menu-list{grid-template-columns:1fr}.sub{padding-top:28px}.v2-page-head h1{font-size:35px}}
+@media(max-width:900px){.v2-daily-strip{grid-template-columns:1fr 1fr}.v2-daily-strip>div{grid-column:1/-1}}@media(max-width:430px){.v2-feature{grid-template-columns:82px 1fr}.v2-feature img{width:82px}.v2-feature em{display:none}.v2-mission-card.has-image,.v2-mission-card.featured{grid-template-columns:1fr}.v2-mission-card img{height:150px;min-height:0}.v2-purchase-grid button{grid-template-columns:82px 1fr auto}.v2-purchase-grid img{width:82px}.v2-daily-strip{grid-template-columns:1fr}.logo{font-size:13px;letter-spacing:1px}}
+`;document.head.appendChild(v2UiCss);
+guides['新版五大操作介面']=['生活集中生命、體力、精神、飽足與壓力，推薦行動點擊後立即執行；完整結果會寫入生活紀錄。','任務分為主線、支線、委託、打寶與 Boss；尚未解鎖的分類不顯示，任務卡點擊後直接出擊。','購買集中商店、背包、裝備、強化與資產；經營集中收益與事件；隊伍使用總覽、能力、裝備、技能及關係分頁。'];
+document.body.classList.add('v2-ready');window.v2SwitchPrimary=v2SwitchPrimary;window.v2OpenPage=v2OpenPage;window.v2StartBasicMission=v2StartBasicMission;
+renderDirectParty=v2RenderParty;window.renderDirectParty=v2RenderParty;
+v2EnsurePages();v2BuildNavigation();v2RenderLife();v2RenderMissions();v2RenderPurchase();v2RenderParty();v2EnhanceShop();v2RenderIndustryHeader();v2Restore();
 renderGearMaker();renderDirectParty();
 renderCombatOptions();renderBattle();
 })();
